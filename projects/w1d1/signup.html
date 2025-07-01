@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Kayıt Ol </title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <h1> Hesap Oluştur </h1>
+
+    <form action="/submit" method="post">
+        <label for="name">
+            Ad Soyad:
+            <input type="text" name="name" id="name" placeholder="Ad Soyad...">
+        </label>
+
+        <label for="email">
+            <div>
+                Email: <span> * </span>
+            </div>
+            <input type="email" name="email" id="email" placeholder="E-posta..." required>
+        </label>
+
+        <label for="password">
+            <div>
+                Şifre: <span> * </span>
+            </div>
+            <input type="password" name="password" id="password" placeholder="Şifre..." required>
+        </label>
+
+        <label for="passwordconf">
+            <div>
+                Şifreyi Onayla: <span> * </span>
+            </div>
+            <input type="password" name="passwordconf" id="passwordconf" placeholder="Şifre..." required>
+        </label>
+
+        <button type="submit"> Kayıt Ol </button>
+    </form>
+
+    <a href="/projects/w1d1/login.html"> Zaten bir hesabın var mı? Giriş Yap </a>
+
+</body>
+
+</html>

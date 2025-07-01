@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Giriş Yap </title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <h1> Giriş Yap </h1>
+
+    <form action="/submit" method="post">
+        <label for="email">
+            <div>
+                E-posta: <span> * </span>
+            </div>
+            <input type="email" placeholder="Email..." name="email" id="email" required>
+        </label>
+
+        <label for="password">
+            <div>
+                Şifre: <span> * </span>
+            </div>
+            <input type="password" placeholder="Password..." name="password" id="password" required>
+        </label>
+
+        <label for="hatirla" class="rememberme">
+            Beni Hatırla
+            <input type="checkbox" name="hatirla" id="hatirla">
+        </label>
+
+        <button type="submit"> Giriş Yap </button>
+
+        
+
+    </form>
+
+    <a href="/projects/w1d1/signup.html"> Hesabın yok mu? Hemen Kayıt Ol </a>
+
+</body>
+
+</html>
