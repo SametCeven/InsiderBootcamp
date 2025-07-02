@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root{
+    --primary-color: #20262E;
+    --secondary-color: #913175;
+    --third-color: #CD5888;
+    --fourth-color: #E9E8E8;
+    --rounded-md: 10px;
+    --primary-font: "Roboto";
+    --secondary-font: "Montserrat";
+}
+
+body{
+    background-color: var(--fourth-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem;
+    height: 100vh;
+    font-family: var(--primary-font);
+}
+
+.form-container{
+    background-color: white;
+    padding: 3rem 5rem;
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--rounded-md);
+    box-shadow: 0 0 5px var(--primary-color);
+    width: 100%;
+    max-width: 15rem;
+}
+
+h1{
+    font-family: var(--secondary-font);
+    color: var(--secondary-color);
+}
+
+a{
+    text-decoration: none;
+    color: var(--secondary-color);
+    transition: color 0.3s ease;
+}
+
+a:hover{
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+label{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+label:hover{
+    cursor: pointer;
+}
+
+span{
+    color: var(--secondary-color);
+}
+
+input{
+    width: 100%;
+    padding: 1rem 1rem;
+    margin-bottom: 2rem;
+    border:1px solid var(--fourth-color);
+    border-radius: var(--rounded-md);
+    outline: none;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+input:focus{
+    border: 1px solid var(--secondary-color);
+    box-shadow: 0 0 5px var(--secondary-color);
+}
+
+button{
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--rounded-md);
+    cursor: pointer;
+    padding: 1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover{
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.rememberme{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.checkbox{
+    width: 1rem;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.checkbox:focus{
+    border-color: black;
+    box-shadow: none;
+}
+
