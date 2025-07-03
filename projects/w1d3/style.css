@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&display=swap');
+
+
+:root{
+    --primary-color: #386641;
+    --secondary-color: #6a994e;
+    --third-color: #a7c957;
+    --fourth-color: #f2e8cf;
+    --fifth-color: #bc4749;
+    --sixth-color: #f8f9fa;
+
+    --rounded-md: 10px;
+
+    --primary-font: "Roboto";
+    --secondary-font: "Montserrat";
+    --third-font: "Satisfy"
+}
+
+body{
+    font-family: var(--primary-font),var(--secondary-font);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+h1{
+    margin-bottom: 2rem;
+    font-family: var(--third-font);
+    font-size: 3rem;
+    color: var(--fifth-color);
+}
+
+.product-info p{
+    font-family: var(--secondary-font);
+    font-size: small;
+}
+
+.product-grid{
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 1rem 1rem;
+    width: 100%;
+}
+
+.product-card{
+    position: relative;
+    width: 15rem;
+    height: 20rem;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--rounded-md);
+    padding: 1rem 0.1rem;
+    background-color: var(--sixth-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 5px var(--secondary-color);
+    transition: all 0.5s ease;
+}
+
+.product-card:hover{
+    box-shadow: 0 0 50px var(--third-color);
+    transform: translateY(-0.5rem);
+}
+
+.product-image{
+    overflow: hidden;
+    height: 15rem;
+}
+
+.product-image img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    border-radius: var(--rounded-md);
+}
+
+.product-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.product-info button{
+    margin-top: auto;
+}
+
+.tükendi{
+    position: absolute;
+    left: -10px;
+    top: 30px;
+    border: 1px solid var(--fifth-color);
+    border-radius: var(--rounded-md);
+    background-color: var(--fifth-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    transform: rotate(-45deg);
+    transform-origin: 0 0;
+}
+
+button{
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: var(--rounded-md);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in;
+}
+
+button:hover{
+    background-color: var(--primary-color);
+}
+
+
+/* @media screen and (max-width:1024px) {
+    .product-grid{
+        grid-template-columns: repeat(3,1fr);
+    }
+}
+
+@media screen and (max-width:768px) {
+    .product-grid{
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+@media screen and (max-width:480px) {
+    .product-grid{
+        grid-template-columns: repeat(1,1fr);
+    }
+} */
+
