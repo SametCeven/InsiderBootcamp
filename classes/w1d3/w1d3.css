@@ -1,0 +1,27 @@
+
+body{
+}
+
+body{
+    padding: 40px;
+}
+
+h2{
+    margin-bottom: 10px;
+}
+
+.card{
+    background-color: bisque;
+}
+
+
+.gallery-container{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.featured{
+    grid-column: span 2;
+    background-color: yellow;
+}

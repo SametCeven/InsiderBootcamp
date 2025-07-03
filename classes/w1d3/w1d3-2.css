@@ -1,0 +1,20 @@
+body {
+    color: blue;
+}
+
+.box{
+    width: 10rem;
+    height: 10rem;
+    background-color: blue;
+    margin: 5rem;
+    animation: hareket 2s linear infinite;
+}
+
+@keyframes hareket{
+    from{
+        transform: translateX(0);
+    }
+    to{
+        transform: translateX(300px);
+    }
+}
