@@ -21,6 +21,16 @@
 }
 
 
+/* RESET CSS */
+p{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
 
 /* SHARED ELEMENTS */
 body {
@@ -35,11 +45,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-p{
-    margin: 0;
-    padding: 0;
 }
 
 nav {
