@@ -27,6 +27,7 @@
     position: absolute;
     z-index: 1;
     left: 50%;
+    top: 10%;
     transform: translateX(-50%);
 }
 
@@ -81,4 +82,9 @@
 iframe{
     width: 100%;
     height: 20rem;
+}
+
+.character-description h3{
+    font-size: large;
+    font-weight: bold;
 }
