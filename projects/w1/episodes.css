@@ -4,7 +4,7 @@
     justify-content: center;
     justify-items: center;
     align-items: center;
-    grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+    grid-template-columns: repeat(auto-fit,minmax(350px,1fr));
     gap: 8rem 2rem;
     width: 100%;
 }
