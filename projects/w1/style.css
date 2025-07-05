@@ -68,7 +68,8 @@ nav a:hover{
 
 .tooltip-wrapper{
     position: relative;
-    display: inline-block;
+    width: 20rem;
+    height: 15rem;
 }
 
 .tooltip{
@@ -79,10 +80,11 @@ nav a:hover{
     border: 1px solid var(--primary-color);
     padding: 1rem;
     border-radius: var(--rounded-md);
-    width: 10rem;
     text-align: center;
     transition: all 0.3s ease;
-    animation: border 2s linear infinite alternate;
+    box-shadow: 0 0 10px var(--primary-color);
+    animation: border 2s linear infinite alternate, box-shadow 2s linear infinite alternate;
+
 }
 
 .tooltip-body{
@@ -101,12 +103,14 @@ nav a:hover{
     pointer-events: auto;
     z-index: 10;
     transition: all 0.3s ease;
+    width: 25rem;
+    max-width: 90vw;
+    word-wrap: break-word;
 }
 
 .tooltip-wrapper:hover .tooltip-body{
     visibility: visible;
     opacity: 1;
-    width: 25rem;
     z-index: 2;
 }
 
@@ -118,11 +122,28 @@ nav a:hover{
 
 @keyframes border {
     0%{
-        border-color: var(--gradient-1-color)
+        border-color: var(--gradient-1-color);
     }
     100%{
         border-color: var(--primary-color);
     }
+}
+
+@keyframes box-shadow {
+    0%{
+        box-shadow: 0 0 10px  var(--gradient-1-color);
+    }
+    100%{
+        box-shadow: 0 0 10px  var(--primary-color);
+    }
+}
+
+.main-page-container .tooltip-wrapper{
+    width: 10rem;
+}
+
+.main-page-container .tooltip{
+    width: 100%
 }
 
 
