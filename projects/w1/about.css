@@ -1,0 +1,49 @@
+.about-container{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+h2{
+    font-size: 30px;
+    margin: 2rem 0 4rem 0;
+    font-family: var(--third-font);
+}
+
+
+/* SOCIAL */
+
+.social{
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.social a{
+    text-decoration: none;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: border 2s linear infinite alternate, box-shadow 2s linear infinite alternate;
+}
+
+.social a img {
+    width: 100%;
+}
+
+.social a {
+    border: 1px solid transparent;
+    border-radius: var(--rounded-md);
+    padding: 2rem;
+    width: 3rem;
+    height: 3rem;
+    transition: all 0.3s ease;
+}
+
+.social a:hover{
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(1rem);
+}
