@@ -29,19 +29,16 @@ h2 {
     align-items: center;
     justify-content: center;
     animation: border 2s linear infinite alternate, box-shadow 2s linear infinite alternate;
-}
-
-.social a img {
-    width: 100%;
-}
-
-.social a {
     border: 1px solid transparent;
     border-radius: var(--rounded-md);
     padding: 2rem;
     width: 3rem;
     height: 3rem;
     transition: all 0.3s ease;
+}
+
+.social a img {
+    width: 100%;
 }
 
 .social a:hover {

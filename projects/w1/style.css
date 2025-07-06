@@ -10,8 +10,8 @@
     --third-color: #00ADB5;
     --fourth-color: #EEEEEE;
 
-    --gradient-1-color: rgba(238, 174, 202, 1);
-    --gradient-2-color: rgba(148, 187, 233, 1);
+    --gradient-1-color: #eeaeca;
+    --gradient-2-color: #94bbe9;
 
     --rounded-md: 10px;
 
@@ -61,10 +61,6 @@ nav a:hover {
 .active {
     background-color: var(--primary-color);
     color: white;
-}
-
-.no-overflow {
-    overflow: hidden;
 }
 
 .nav-mobile {
@@ -150,6 +146,7 @@ nav a:hover {
     width: 25rem;
     max-width: 90vw;
     word-wrap: break-word;
+    transition: all 0.5s ease;
 }
 
 .tooltip-wrapper:hover .tooltip-body {
