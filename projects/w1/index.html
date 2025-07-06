@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./index.css">
+    <link rel="icon" href="./assets/favicon-16x16.png">
 </head>
 
 <body class="no-overflow">
@@ -31,7 +32,7 @@
         </div>
     </div>
 
-    <div class="main-page-container">
+    <main class="main-page-container">
 
         <header>
             <h1> FRIENDS </h1>
@@ -43,10 +44,10 @@
             </div>
         </header>
 
-        <main class="main-page-detail">
+        <div class="main-page-detail">
 
             <!--  ABOUT FRIENDS TOOLTIP !-->
-            <div class="tooltip-wrapper">
+            <section class="tooltip-wrapper">
                 <div class="tooltip">
                     About Friends
                 </div>
@@ -58,14 +59,17 @@
                     of all ages. Whether it's a laugh at Central Perk or a heartfelt scene in Monica's apartment, the
                     show captures the essence of friendship and everyday life in a way that feels both nostalgic and
                     refreshingly relatable. </p>
-            </div>
+            </section>
 
             <!--  CHARACTERS TOOLTIP !-->
-            <div class="tooltip-wrapper">
+            <section class="tooltip-wrapper">
                 <div class="tooltip">
                     Characters
                 </div>
+
                 <div class="tooltip-body characters">
+
+                    <!--  CHARACTER 1 !-->
                     <div class="character-wrapper">
                         <div class="character-description">
                             <h3> Rachel Green </h3>
@@ -79,6 +83,7 @@
                         </div>
                     </div>
 
+                    <!--  CHARACTER 2 !-->
                     <div class="character-wrapper">
                         <div class="character-description">
                             <h3> Ross Geller </h3>
@@ -90,7 +95,8 @@
                             <img src="./assets/ross-geller.jpg" alt="ross-geller">
                         </div>
                     </div>
-
+                    
+                    <!--  CHARACTER 3 !-->
                     <div class="character-wrapper">
                         <div class="character-description">
                             <h3> Monica Geller </h3>
@@ -102,11 +108,12 @@
                             <img src="./assets/monica-geller.jpg" alt="monica-geller">
                         </div>
                     </div>
+
                 </div>
-            </div>
+            </section>
 
             <!--  FAVORITE SCENE TOOLTIP !-->
-            <div class="tooltip-wrapper">
+            <section class="tooltip-wrapper">
                 <div class="tooltip">
                     Favorite Scene
                 </div>
@@ -117,11 +124,11 @@
                         allowfullscreen>
                     </iframe>
                 </div>
-            </div>
+            </section>
 
-        </main>
+        </div>
 
-    </div>
+    </main>
 
     <script src="./index.js"></script>
 
