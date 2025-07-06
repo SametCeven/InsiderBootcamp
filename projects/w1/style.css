@@ -39,10 +39,10 @@ nav {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 1rem;
-    margin: 0 0 5rem 0;
     width: 20rem;
     border: 1px solid var(--primary-color);
     border-radius: var(--rounded-md);
+    transition: all 0.3s ease;
 }
 
 nav a {
@@ -65,6 +65,12 @@ nav a:hover {
 
 .no-overflow {
     overflow: hidden;
+}
+
+.nav-mobile {
+    visibility: hidden;
+    width: 0;
+    height: 0;
 }
 
 /* TOOLTIPS */
@@ -124,6 +130,37 @@ nav a:hover {
     transform: translateY(1rem);
 }
 
+.nav-mobile .tooltip-body{
+    top: 150%;
+    bottom: 0;
+    left: 3rem;
+    animation: none;
+    width: 6rem;
+    height: 8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.2rem;
+    transform: translateX(-50%);
+    transform: translateY(-50%);
+}
+
+.nav-mobile .tooltip-body a{
+    color: white;
+}
+
+.nav-mobile .tooltip-body a:hover{
+    background-color: white;
+    color: var(--primary-color);
+}
+
+.nav-mobile .active {
+    background-color: white;
+    color: var(--primary-color) !important;
+}
+
+
+
 @keyframes border {
     0% {
         border-color: var(--gradient-1-color);
@@ -161,11 +198,31 @@ nav a:hover {
         width: 8rem;
         font-size: smaller;
     }
+
     body {
         padding: 1rem 1rem;
+        align-items: baseline;
     }
-    .tooltip-body{
+
+    .tooltip-body {
         width: 20rem;
         font-size: 12px;
+    }
+
+    .nav-desktop {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+    }
+
+    .nav-mobile {
+        visibility: visible;
+        width: 2rem;
+        height: 1rem;
+        border: none;
+    }
+
+    .nav-mobile img{
+        width: 100%;
     }
 }
