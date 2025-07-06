@@ -31,7 +31,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 5rem;
+    margin: 1rem 0;
 }
 
 nav {
@@ -71,6 +71,40 @@ nav a:hover {
     visibility: hidden;
     width: 0;
     height: 0;
+}
+
+.fav-icon-wrapper{
+    width: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.fav-icon-wrapper svg{
+    width: 100%;
+    height: auto;
+}
+
+.fav-icon-wrapper svg path{
+    stroke: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.fav-icon-wrapper:hover {
+    transform: scale(1.2);
+}
+
+.fav-icon-wrapper.like svg path{
+    stroke: var(--gradient-2-color);
+    fill: var(--gradient-1-color)
+}
+
+.nav-container{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
 }
 
 /* TOOLTIPS */
@@ -192,6 +226,7 @@ nav a:hover {
 
 
 
+
 /* MEDIA QUERY */
 @media screen and (max-width:1000px) {
     .main-page-container .tooltip {
@@ -210,9 +245,7 @@ nav a:hover {
     }
 
     .nav-desktop {
-        visibility: hidden;
-        width: 0;
-        height: 0;
+        display: none;
     }
 
     .nav-mobile {
@@ -224,5 +257,10 @@ nav a:hover {
 
     .nav-mobile img{
         width: 100%;
+    }
+
+    .nav-container{
+        justify-content: flex-start;
+        gap: 3rem;
     }
 }
