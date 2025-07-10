@@ -56,8 +56,8 @@ function collatzChainRefactored(startingNum, cache) {
     let chain = 1;
     let lastTerm = startingNum;
 
-    while(lastTerm !==1){
-        if(cache[lastTerm]){
+    while (lastTerm !== 1) {
+        if (cache[lastTerm]) {
             chain = chain + cache[lastTerm] - 1;
             break;
         }
