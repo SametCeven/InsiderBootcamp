@@ -5,12 +5,13 @@ const form = document.querySelector(".form-section");
 const formTitle = document.getElementById("title");
 const formDescription = document.getElementById("description");
 const formRadio = document.querySelector(".form-section form .radio");
+const formAllRadios = document.querySelectorAll(".form-section .radio input")
 const formButton = document.querySelector(".form-section form button");
 
-const currentTaskSection = document.querySelector(".current-task-section");
+const currentTaskSection = document.querySelector(".task-section");
 
 
-// FORM EVENTS
+// FORM INPUT EVENT
 form.addEventListener("change",(e)=>{
     e.stopPropagation()
     console.log(e)
@@ -27,6 +28,8 @@ form.addEventListener("change",(e)=>{
     console.log(formData);
 })
 
+
+// FORM BUTTON SUBMIT EVENT
 formButton.addEventListener("click",(e)=>{
     e.preventDefault();
     formTitle.value = "";
@@ -34,8 +37,12 @@ formButton.addEventListener("click",(e)=>{
     formDescription.value = "";
     formDescription.textContent = "";
     formRadio.value = "";
-
+    formAllRadios.forEach((r)=>{
+        r.checked = false;
+    })
+    
     const div = document.createElement("div");
+    div.classList.add("task")
     
     const h2 = document.createElement("h2");
     h2.value = formData.formTitle,
@@ -45,12 +52,33 @@ formButton.addEventListener("click",(e)=>{
     p.value = formData.formDescription;
     p.textContent = formData.formDescription;
 
-    const r = document.createElement("p");
-    r.value = formData.formRadio;
-    r.textContent = formData.formRadio;
+    const infoContainer = document.createElement("div");
+    infoContainer.classList.add("info-container")
 
+    const span = document.createElement("span");
+    span.value = formData.formRadio;
+    span.textContent = formData.formRadio;
+
+    const inputCheckbox = document.createElement("input");
+    inputCheckbox.type = "checkbox";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "-"
+
+    infoContainer.appendChild(span);
+    infoContainer.appendChild(inputCheckbox);
+    infoContainer.appendChild(deleteButton);
+
+    div.appendChild(infoContainer);
     div.appendChild(h2);
     div.appendChild(p);
-    div.appendChild(r);
     currentTaskSection.appendChild(div);
+
+    formData = {};
 })
+
+
+
+// CURRENT TASK ELEMENTS
+const deleteButton = document.querySelector(".task button")
+const inputCheckbox = document.querySelector(".task input")
