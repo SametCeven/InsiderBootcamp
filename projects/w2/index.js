@@ -13,11 +13,6 @@ const currentTaskSection = document.querySelector(".task-section");
 
 // FORM INPUT EVENT
 form.addEventListener("change",(e)=>{
-    e.stopPropagation()
-    console.log(e)
-    console.log(e.target)
-    console.log(e.currentTarget)
-
     if(e.target === formTitle){
         formData["formTitle"] = e.target.value;
     }else if(e.target === formDescription){
@@ -25,7 +20,6 @@ form.addEventListener("change",(e)=>{
     }else if(e.target.type === "radio"){
         formData["formRadio"] = e.target.value;
     }
-    console.log(formData);
 })
 
 
@@ -80,5 +74,10 @@ formButton.addEventListener("click",(e)=>{
 
 
 // CURRENT TASK ELEMENTS
-const deleteButton = document.querySelector(".task button")
-const inputCheckbox = document.querySelector(".task input")
+currentTaskSection.addEventListener("click",((e)=>{
+    if(e.target.tagName === "BUTTON"){
+        e.stopPropagation();
+        const task = e.target.closest(".task");
+        task.remove();
+    }
+}))
