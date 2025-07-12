@@ -181,3 +181,18 @@ h2{
 .task-section .task:has(input:checked){
     background-color: rgb(227, 245, 227);
 }
+
+
+/* FORM VALIDATION */
+.error-container{
+    font-size: smaller;
+    color: var(--error-color);
+    display: flex;
+    flex-direction: column;
+    gap:0.2rem;
+    margin-top: 2rem;
+}
+
+.error-message{
+
+}
