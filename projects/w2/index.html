@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,54 @@
     <link rel="stylesheet" href="./reset.css">
     <link rel="stylesheet" href="./index.css">
 </head>
+
 <body>
-    
+
+    <header>
+        <h1> To Do List </h1>
+    </header>
+
+    <main>
+
+        <section class="form-section">
+            <form action="">
+                <label>
+                    <input type="text" name="title" id="title" placeholder="Add Title">
+                </label>
+                <label>
+                    <input type="textarea" name="description" id="description" placeholder="Add Description">
+                </label>
+                <div class="radio">
+                    <span> Priority : </span>
+                    <label>
+                        High
+                        <input type="radio" name="priority" id="high" value="high">
+                    </label>
+                    <label>
+                        Medium
+                        <input type="radio" name="priority" id="medium" value="medium">
+                    </label>
+                    <label>
+                        Low
+                        <input type="radio" name="priority" id="low" value="low">
+                    </label>
+                </div>
+                <button type="submit" class="btn"> Add Task </button>
+            </form>
+        </section>
+
+        <section class="current-task-section">
+            
+        </section>
+
+    </main>
+
+
+
+
+
 
     <script src="./index.js"></script>
 </body>
+
 </html>

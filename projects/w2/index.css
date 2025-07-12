@@ -19,3 +19,93 @@
     --secondary-font: "Montserrat";
     --third-font: "Satisfy"
 }
+
+
+/* BODY & MAIN & HEADER */
+body{
+    font-family: var(--primary-font);
+    background: radial-gradient(circle, var(--gradient-1-color) 0%, var(--gradient-2-color) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem;
+    padding: 3rem 5rem 1rem 5rem ;
+    color: var(--primary-color);
+}
+
+main{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+header h1{
+    font-size: 40px;
+    font-weight: bold;
+    font-family: var(--third-font);
+    text-align: center;
+}
+
+
+/* FORM SECTION */
+.form-section form{
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.form-section form label{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+}
+
+.form-section form input{
+    border: 1px solid var(--primary-color);
+    border-radius: var(--rounded-md);
+    padding: 1rem 1rem;
+    width: 100%;
+}
+
+.form-section form .radio{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-weight: bold;
+}
+
+.form-section form .radio span{
+    margin-right: 1rem;
+}
+
+.form-section form .radio label{
+    display: flex;
+    justify-content: flex-start;
+    gap:0;
+    font-size: smaller;
+    font-weight: 300;
+    cursor: pointer;
+}
+
+
+/* BUTTONS */
+.btn{
+    text-align: center;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--rounded-md);
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 3rem;
+    margin: 0 auto;
+    font-weight: bold;
+    transition:  all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn:hover{
+    background-color: var(--gradient-1-color);
+    color: black;
+}
