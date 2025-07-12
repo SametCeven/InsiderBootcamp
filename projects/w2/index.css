@@ -215,3 +215,19 @@ h2{
     cursor: pointer;
 }
 
+
+/* MEDIA QUERY */
+@media screen and (max-width:1000px) {
+    main{
+        flex-direction: column;
+    }
+    .form-section{
+        margin-bottom: 8rem;
+    }
+}
+
+@media screen and (max-width:600px) {
+    body{
+        padding: 3rem 1rem 1rem 1rem ;
+    }
+}
