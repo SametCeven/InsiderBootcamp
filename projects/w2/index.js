@@ -9,11 +9,12 @@ const formAllRadios = document.querySelectorAll(".form-section .radio input")
 const formButton = document.querySelector(".form-section form button");
 
 const currentTaskSection = document.querySelector(".task-section");
+const tasks = document.querySelector(".tasks");
 
 const filter = document.getElementById("filter");
 const sort = document.getElementById("sort");
 
-
+let taskList = [];
 
 // FORM INPUT EVENT
 form.addEventListener("change", (e) => {
@@ -87,10 +88,12 @@ formButton.addEventListener("click", (e) => {
         infoContainer.appendChild(inputCheckbox);
         infoContainer.appendChild(deleteButton);
 
+        div.setAttribute("priority", formData.formRadio);
         div.appendChild(infoContainer);
         div.appendChild(h2);
         div.appendChild(p);
-        currentTaskSection.appendChild(div);
+        taskList.push(div);
+        tasks.appendChild(div);
 
         formData = {};
 
@@ -125,7 +128,7 @@ currentTaskSection.addEventListener("click", ((e) => {
         e.stopPropagation();
         const task = e.target.closest(".task");
         task.remove();
-    }else if(e.target.tagName === "INPUT"){
+    } else if (e.target.tagName === "INPUT") {
         e.stopPropagation();
         const task = e.target.closest(".task")
         task.classList.toggle("completed", e.target.checked);
@@ -135,21 +138,60 @@ currentTaskSection.addEventListener("click", ((e) => {
 
 
 // FILTER BUTTON
-filter.addEventListener("change",((e)=>{
+filter.addEventListener("change", ((e) => {
     const allTasks = document.querySelectorAll(".task");
-    allTasks.forEach((task)=>{
+    allTasks.forEach((task) => {
         const isCompleted = task.classList.contains("completed");
 
-        if(e.target.value === "all"){
+        if (e.target.value === "all") {
             task.style.display = "flex";
-        }else if(e.target.value === "completed" && !isCompleted){
+        } else if (e.target.value === "completed" && !isCompleted) {
             task.style.display = "none";
-        }else if(e.target.value === "incomplete" && isCompleted){
+        } else if (e.target.value === "incomplete" && isCompleted) {
             task.style.display = "none";
-        }else{
+        } else {
             task.style.display = "flex";
         }
     })
 }))
+
+
+
+// SORT BUTTON
+const priorityOrder = {
+    high: 3,
+    medium: 2,
+    low: 1,
+}
+sort.addEventListener("change", (e) => {
+    const allTasks = Array.from(document.querySelectorAll(".task"));
+
+    if (e.target.value === "asc") {
+        const sortedTasks = allTasks.sort((a, b) => {
+            const aPriority = priorityOrder[a.getAttribute("priority")];
+            const bPriority = priorityOrder[b.getAttribute("priority")];
+            return aPriority - bPriority;
+        })
+        tasks.innerHTML = "";
+        sortedTasks.forEach((task) => {
+            tasks.appendChild(task);
+        })
+    } else if (e.target.value === "desc") {
+        const sortedTasks = allTasks.sort((a, b) => {
+            const aPriority = priorityOrder[a.getAttribute("priority")];
+            const bPriority = priorityOrder[b.getAttribute("priority")];
+            return bPriority - aPriority;
+        })
+        tasks.innerHTML = "";
+        sortedTasks.forEach((task) => {
+            tasks.appendChild(task);
+        })
+    } else if (e.target.value === "none") {
+        tasks.innerHTML = "";
+        taskList.forEach((task) => {
+            tasks.appendChild(task);
+        })
+    }
+})
 
 
