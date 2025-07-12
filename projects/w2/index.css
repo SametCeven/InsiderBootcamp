@@ -193,6 +193,25 @@ h2{
     margin-top: 2rem;
 }
 
-.error-message{
 
+/* TASK-SECTION FILTER & SORT BUTTONS */
+.task-section-nav{
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
+
+.task-section-nav select{
+    border: 1px solid black;
+    border-radius: var(--rounded-md);
+    padding: 0.3rem 1rem;
+    cursor: pointer;
+}
+
+.task-section-nav button{
+    border: 1px solid black;
+    border-radius: var(--rounded-md);
+    padding: 0.3rem 1rem;
+    cursor: pointer;
+}
+

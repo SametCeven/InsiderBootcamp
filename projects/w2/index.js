@@ -10,6 +10,10 @@ const formButton = document.querySelector(".form-section form button");
 
 const currentTaskSection = document.querySelector(".task-section");
 
+const filter = document.getElementById("filter");
+const sort = document.getElementById("sort");
+
+
 
 // FORM INPUT EVENT
 form.addEventListener("change", (e) => {
@@ -21,6 +25,7 @@ form.addEventListener("change", (e) => {
         formData["formRadio"] = e.target.value;
     }
 })
+
 
 
 // FORM BUTTON SUBMIT EVENT
@@ -120,9 +125,31 @@ currentTaskSection.addEventListener("click", ((e) => {
         e.stopPropagation();
         const task = e.target.closest(".task");
         task.remove();
+    }else if(e.target.tagName === "INPUT"){
+        e.stopPropagation();
+        const task = e.target.closest(".task")
+        task.classList.toggle("completed", e.target.checked);
     }
 }))
 
 
+
+// FILTER BUTTON
+filter.addEventListener("change",((e)=>{
+    const allTasks = document.querySelectorAll(".task");
+    allTasks.forEach((task)=>{
+        const isCompleted = task.classList.contains("completed");
+
+        if(e.target.value === "all"){
+            task.style.display = "flex";
+        }else if(e.target.value === "completed" && !isCompleted){
+            task.style.display = "none";
+        }else if(e.target.value === "incomplete" && isCompleted){
+            task.style.display = "none";
+        }else{
+            task.style.display = "flex";
+        }
+    })
+}))
 
 
