@@ -39,8 +39,6 @@ formButton.addEventListener("click", (e) => {
 
         if (!formData.formTitle) errors.push("Title is required!")
 
-        if (!formData.formDescription) errors.push("Description is required!")
-
         if (!formData.formRadio) errors.push("Priority is required!")
 
         if (errors.length > 0) throw new Error(errors.join(""));
