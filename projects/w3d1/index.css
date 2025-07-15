@@ -1,0 +1,75 @@
+body {
+    background-color: #113F67;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    font-family: arial;
+}
+
+header {
+    font-size: 30px;
+}
+
+.table {
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px #58A0C8;
+}
+
+.table tr{
+    transition: all 0.3s ease;
+}
+
+.table th,
+.table td {
+    padding: 1rem 2rem;
+    text-align: left;
+    border-bottom: 1px solid #58A0C8;
+}
+
+.table-head {
+    background-color: #FDF5AA;
+    color: #113F67;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.form input {
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 5rem;
+}
+
+.form button {
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form button:hover {
+    background-color: #FDF5AA;
+    color: #113F67;
+}
+
+.delete-button{
+    border-radius: 10px;
+    border: 1px solid red;
+    cursor: pointer;
+    padding: 0.3rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.delete-button:hover{
+    background-color: red;
+    color: #113F67;
+}

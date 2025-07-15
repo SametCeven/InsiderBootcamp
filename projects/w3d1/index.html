@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <h1> Student Data </h1>
+    </header>
+
+    <main class="table-container">
+        <table class="table">
+            <thead class="table-head">
+                <tr>
+                    <th> Name </th>
+                    <th> Last Name </th>
+                    <th> Age </th>
+                    <th> Class </th>
+                    <th> Actions </th>
+                </tr>
+            </thead>
+            <tbody class="table-data">
+
+            </tbody>
+        </table>
+    </main>
+
+    <form class="form">
+        <div class="input-container">
+            <label>
+                <input type="text" placeholder="Name..." id="name">
+            </label>
+            <label>
+                <input type="text" placeholder="Last Name..." id="lastName" >
+            </label>
+            <label>
+                <input type="number" placeholder="Age..." id="age" min="1">
+            </label>
+            <label>
+                <input type="text" placeholder="Class..." id="classInfo">
+            </label>
+        </div>
+        <div class="button-container">
+            <button type="button"> Add Student </button>
+        </div>
+    </form>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type="module" src="./index.js"></script>
+</body>
+
+</html>
