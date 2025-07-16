@@ -2,6 +2,7 @@
 $(document).ready(() => {
 
     let posts = [];
+    let error;
 
     // LOADING & ERROR STATE MANAGEMENT
     let loadingState = false;
@@ -15,7 +16,7 @@ $(document).ready(() => {
             $("#post-container").append($loadingElement);
         }).ajaxSuccess(() => {
             errorState = false;
-        }).ajaxError(() => {
+        }).ajaxError((e) => {
             errorState = true;
         }).ajaxComplete(() => {
             loadingState = false;
@@ -38,10 +39,22 @@ $(document).ready(() => {
     }
 
 
+    // UTIL FUNCTION FOR ADDING ERROR MESSAGE TO DOM
+    function renderError() {
+        const errorNotification =
+            `
+            <div class="error">
+                <h2> ${error.status} </h2>
+                <p> ${error.statusText} </p>
+            </div> 
+        `
+        $("#post-container").append(errorNotification);
+    }
+
 
     // GETTING DATA FROM JSONPLACEHOLDER
-    function getData(limit, offset) {
-        const baseUrl = `https://jsonplaceholder.typicode.com/posts/?_limit=${limit}&_start=${offset}`;
+    function getData(url, limit, offset) {
+        const baseUrl = `https://jsonplaceholder.typicode.com/posts/${url}/?_limit=${limit}&_start=${offset}`;
 
         $.ajax({
             url: baseUrl,
@@ -50,15 +63,37 @@ $(document).ready(() => {
             posts.push(...res);
             renderPosts();
         }).fail((err) => {
-            console.error(err);
+            error = err;
+            renderError();
         })
     }
 
     let limit = 5;
     let offset = 0;
-    getData(limit, offset);
+    getData("", limit, offset);
 
 
+
+    // ADDING CLICK EVENT TO RESET PAGE
+    $("#reset-page").click(() => {
+        $("#post-container").empty();
+        posts = [];
+        getData("",limit,offset);
+    })
+
+
+    // ADDING CLICK EVENT TO EMULATE LOADING REQUEST
+    $("#loading-request").click(() => {
+        $("#post-container").empty();
+        $("#post-container").append($loadingElement);
+    })
+
+
+    // ADDING CLICK EVENT TO EMULATE BAD REQUEST
+    $("#bad-request").click(() => {
+        $("#post-container").empty();
+        getData("error");
+    })
 
 
 
