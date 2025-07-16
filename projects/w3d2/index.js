@@ -1,35 +1,24 @@
 
 $(document).ready(() => {
 
-    let posts = [];
-    let error;
+    let error = null;
+    let isFetching = false;
 
-    // LOADING & ERROR STATE MANAGEMENT
-    let loadingState = false;
-    let errorState = null;
-
-    const $loadingElement = `<div class="loading"> Loading ... </div>`
-
+    // LOADING STATE MANAGEMENT
     $(document)
         .ajaxStart(() => {
-            loadingState = true;
-            $("#post-container").append($loadingElement);
-        }).ajaxSuccess(() => {
-            errorState = false;
-        }).ajaxError((e) => {
-            errorState = true;
+            renderLoading();
         }).ajaxComplete(() => {
-            loadingState = false;
             $(".loading").remove();
         });
 
 
     // UTIL FUNCTION FOR ADDING DATA TO DOM
-    function renderPosts() {
-        posts.forEach((post) => {
+    function renderPosts(newPosts) {
+        newPosts.forEach((post) => {
             const $postItem =
                 `
-                <div class="post-item">
+                <div class="post-item" data-postid=${post.id}>
                     <h2> ${post.title} </h2>
                     <p> ${post.body} </p>
                 </div>
@@ -44,48 +33,61 @@ $(document).ready(() => {
         const errorNotification =
             `
             <div class="error">
-                <h2> ${error.status} </h2>
-                <p> ${error.statusText} </p>
+                <h2> Error Status : ${error.status} </h2>
+                <p> Error Status Text : ${error.statusText} </p>
             </div> 
         `
         $("#post-container").append(errorNotification);
     }
 
 
+    // UTIL FUNCTION FOR ADDING LOADING MESSAGE TO DOM
+    function renderLoading() {
+        const loadingNotification = `<div class="loading"> Loading ... </div>`
+        $("#post-container").append(loadingNotification);
+    }
+
+
     // GETTING DATA FROM JSONPLACEHOLDER
     function getData(url, limit, offset) {
         const baseUrl = `https://jsonplaceholder.typicode.com/posts/${url}/?_limit=${limit}&_start=${offset}`;
+        isFetching = true;
 
         $.ajax({
             url: baseUrl,
             method: "GET",
         }).done((res) => {
-            posts.push(...res);
-            renderPosts();
+            console.log(res)
+            renderPosts(res);
         }).fail((err) => {
             error = err;
             renderError();
+        }).always(()=>{
+            isFetching = false;
         })
     }
 
+
+    // GETTING DATA WHEN PAGE IS INITIALIZED
     let limit = 5;
     let offset = 0;
     getData("", limit, offset);
 
 
-
     // ADDING CLICK EVENT TO RESET PAGE
     $("#reset-page").click(() => {
         $("#post-container").empty();
-        posts = [];
-        getData("",limit,offset);
+        $(".postid").remove();
+        limit = 5;
+        offset = 0;
+        getData("", limit, offset);
     })
 
 
     // ADDING CLICK EVENT TO EMULATE LOADING REQUEST
     $("#loading-request").click(() => {
         $("#post-container").empty();
-        $("#post-container").append($loadingElement);
+        renderLoading();
     })
 
 
@@ -95,6 +97,47 @@ $(document).ready(() => {
         getData("error");
     })
 
+
+    // ADDING CLICK EVENT TO POSTS TO IDENTIFY ID OF THE POST
+    $("#post-container").on("click", ".post-item", (e) => {
+        const $clicked = $(e.currentTarget);
+        const clickedPostId = $clicked.data("postid");
+        const $existing = $(".postid");
+        const existingPostId = $existing.parent().data("postid");
+        const postInfo = `<div class="postid"> Post Id : ${clickedPostId}</div>`;
+
+        if($existing.length > 0 && clickedPostId !== existingPostId){
+            $existing.remove();
+            $clicked.append(postInfo);
+        }else if($existing.length > 0 && clickedPostId === existingPostId){
+            $existing.remove();
+        }else{
+            $clicked.append(postInfo);
+        }
+    })
+
+
+    // ADDING SCROLL EVENT FOR INFINITE SCROLL
+    const totalPosts = 100;  // max posts provided by jsonplaceholder
+
+    $(window).on("scroll", debounce(() => {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 50) {
+            if (!isFetching && offset < totalPosts) {
+                offset = offset + limit;
+                getData("", limit, offset);
+            }
+        }
+    },500));
+
+
+    // UTIL FUNCTION FOR DEBOUNCE
+    function debounce(fn,delay){
+        let timer;
+        return function(){
+            clearTimeout(timer);
+            timer = setTimeout(fn,delay);
+        }
+    }
 
 
 
