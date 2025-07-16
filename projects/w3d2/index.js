@@ -24,7 +24,7 @@ $(document).ready(() => {
 
 
     // UTIL FUNCTION FOR ADDING DATA TO DOM
-    function addPosts() {
+    function renderPosts() {
         posts.forEach((post) => {
             const $postItem =
                 `
@@ -40,8 +40,6 @@ $(document).ready(() => {
 
 
     // GETTING DATA FROM JSONPLACEHOLDER
-
-
     function getData(limit, offset) {
         const baseUrl = `https://jsonplaceholder.typicode.com/posts/?_limit=${limit}&_start=${offset}`;
 
@@ -50,12 +48,9 @@ $(document).ready(() => {
             method: "GET",
         }).done((res) => {
             posts.push(...res);
-            addPosts();
-            console.log(res);
+            renderPosts();
         }).fail((err) => {
             console.error(err);
-        }).always(() => {
-            console.log(123);
         })
     }
 
