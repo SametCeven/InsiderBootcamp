@@ -2,9 +2,10 @@ $(document).ready(() => {
 
     let error = null;
     let isFetching = false;
-    const results = 6;
+    const results = 60;
     const $userWrapper = $(".user-wrapper");
     const $modalWrapper = $(".modal-wrapper");
+    const $slider = $(".slider");
 
 
     // GETTING DATA FROM RANDOMUSER
@@ -31,6 +32,7 @@ $(document).ready(() => {
     function renderUsers(users) {
         users.forEach((user, index) => {
 
+            // MODAL DEFINITION
             const modalId = `user-${index}`;
             const userModal =
                 `
@@ -46,6 +48,7 @@ $(document).ready(() => {
                 `;
             $modalWrapper.append(userModal);
 
+            // USER CARD DEFINITION
             const $userCard =
                 $(`
                 <a href="javascript:;" data-fancybox="users" data-src="#${modalId}" class="user-card">
@@ -57,7 +60,6 @@ $(document).ready(() => {
                     </div>
                 </a>
                 `);
-
             $userWrapper.append($userCard.hide().fadeIn("slow"));
             $userCard.hover(
                 function () {
@@ -67,17 +69,47 @@ $(document).ready(() => {
                     $(this).removeClass("hovered");
                 })
 
+            // SLIDER DEFINITION
+            const slide =
+                `
+                    <div class="slide">
+                        <img src="${user.picture.medium}"/>
+                    </div>
+                `
+            $slider.append(slide);
 
         });
 
+        // ADDING FANCYBOX
         Fancybox.bind("[data-fancybox='users']");
+
+        //SLICK SETUP
+        if ($slider.hasClass("slick-initialized")) {
+            $slider.slick("unslick");
+        }
+        $slider.slick({
+            infinite: true,
+            slidesToShow: 10,
+            slidesToScroll: 9,
+            dots: true,
+            arrows: true,
+        })
     }
+
+    // ADDING BOUNCE EFFECT TO IMAGES
+    $(document).on("click", ".slider .slide img", function () {
+        const $img = $(this)
+        console.log(1)
+        $img
+            .animate({
+                top: "-=15px"
+            }, 150).animate({
+                top: "+=15px"
+            }, 150)
+    })
 
 
     // GETTING DATA WHEN PAGE IS INITIALIZED
     getData(results);
-
-
-
 
 })

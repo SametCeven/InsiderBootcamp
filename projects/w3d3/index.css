@@ -30,6 +30,10 @@ body {
     margin: 0;
 }
 
+header{
+    margin-bottom: 5rem;
+}
+
 header h2 {
     text-align: center;
     font-family: var(--third-font);
@@ -74,7 +78,7 @@ header h2 {
 
 .hovered {
     transform: scale(1.05);
-    box-shadow: 0 0 30px;
+    border: 1px solid var(--fourth-color);
 }
 
 .user-card-wrapper {
@@ -96,4 +100,29 @@ header h2 {
 .user-modal img{
     border-radius: var(--rounded-sm);
     box-shadow: 0 0 10px var(--third-color);
+}
+
+
+/* SLIDER */
+.slider{
+    cursor: pointer;
+    border: 1px solid var(--primary-color);
+    padding: 1rem;
+    border-radius: var(--rounded-sm);
+    box-shadow: 0 0 10px var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.slider:hover{
+    transform: scale(1.05);
+    border: 1px solid var(--fourth-color);
+}
+
+.slide img{
+    border-radius: var(--rounded-sm);
+    box-shadow: 0 0 1px var(--primary-color);
+}
+
+.slider .slide img{
+    position: relative;
 }
