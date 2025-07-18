@@ -1,0 +1,31 @@
+/* FONT IMPORTS */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&display=swap');
+
+
+/* ROOT DEFINITIONS */
+:root {
+    --primary-color: #222831;
+    --secondary-color: #010202;
+    --third-color: #00ADB5;
+    --fourth-color: #EEEEEE;
+    --error-color: #850505; 
+
+    --gradient-1-color: #eeaeca;
+    --gradient-2-color: #94bbe9;
+
+    --rounded-sm:5px;
+    --rounded-md: 10px;
+
+    --primary-font: "Roboto";
+    --secondary-font: "Montserrat";
+    --third-font: "Satisfy"
+}
+
+body{
+    font-family: var(--primary-font);
+    color: var(--primary-color);
+    background: var(--fourth-color);
+    min-height: 100vh;
+    padding: 2rem;
+    margin: 0;
+}
