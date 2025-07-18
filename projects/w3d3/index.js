@@ -2,7 +2,7 @@ $(document).ready(() => {
 
     let error = null;
     let isFetching = false;
-    const results = 5;
+    const results = 6;
     const $userWrapper = $(".user-wrapper")
 
 
@@ -30,7 +30,7 @@ $(document).ready(() => {
     function renderUsers(users) {
         users.forEach((user) => {
             const $userCard =
-                `
+                $(`
                 <div class="user-card">
                     <img src="${user.picture.large}"/>
                     <div class="user-card-info">
@@ -39,11 +39,18 @@ $(document).ready(() => {
                         <span> ${user.location.country} </span>
                     </div>
                 </div>
-                `;
+                `);
             $userWrapper.append($userCard);
+            $userCard.fadeIn("slow");
+            $userCard.hover(
+                function(){
+                    $(this).addClass("hovered")
+                },
+                function(){
+                    $(this).removeClass("hovered")
+                })
         })
     }
-
 
 
     // GETTING DATA WHEN PAGE IS INITIALIZED
