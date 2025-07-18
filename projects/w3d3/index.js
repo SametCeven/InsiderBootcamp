@@ -43,7 +43,7 @@ $(document).ready(() => {
                         <p>Email: ${user.email}</p>
                         <p>Location: ${user.location.city}, ${user.location.country}</p>
                         <p>Phone: ${user.phone}</p>
-                    </div
+                    </div>
                 </div>
                 `;
             $modalWrapper.append(userModal);
@@ -96,15 +96,14 @@ $(document).ready(() => {
         })
     }
 
-    // ADDING BOUNCE EFFECT TO IMAGES
+    // ADDING BOUNCE EFFECT TO IMAGE CLICKING
     $(document).on("click", ".slider .slide img", function () {
         const $img = $(this)
-        console.log(1)
         $img
             .animate({
-                top: "-=15px"
+                top: "-=10px"
             }, 150).animate({
-                top: "+=15px"
+                top: "+=10px"
             }, 150)
     })
 
