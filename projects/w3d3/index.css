@@ -8,12 +8,12 @@
     --secondary-color: #010202;
     --third-color: #00ADB5;
     --fourth-color: #EEEEEE;
-    --error-color: #850505; 
+    --error-color: #850505;
 
     --gradient-1-color: #eeaeca;
     --gradient-2-color: #94bbe9;
 
-    --rounded-sm:5px;
+    --rounded-sm: 5px;
     --rounded-md: 10px;
 
     --primary-font: "Roboto";
@@ -21,7 +21,7 @@
     --third-font: "Satisfy"
 }
 
-body{
+body {
     font-family: var(--primary-font);
     color: var(--primary-color);
     background: var(--fourth-color);
@@ -30,22 +30,23 @@ body{
     margin: 0;
 }
 
-header h2{
+header h2 {
     text-align: center;
     font-family: var(--third-font);
     font-size: 40px;
     margin-bottom: 3rem;
 }
 
+
 /* USER CARD */
-.user-wrapper{
+.user-wrapper {
     display: flex;
     flex-wrap: wrap;
-    gap:4rem;
+    gap: 4rem;
     width: 100%;
 }
 
-.user-card{
+.user-card {
     display: flex;
     align-items: center;
     width: 40%;
@@ -56,20 +57,43 @@ header h2{
     box-shadow: 0 0 10px var(--primary-color);
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--primary-color);
 }
 
-.user-card img{
+.user-card img {
     border-radius: var(--rounded-sm);
     box-shadow: 0 0 10px var(--primary-color);
 }
 
-.user-card-info{
+.user-card-info {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.hovered{
+.hovered {
     transform: scale(1.05);
     box-shadow: 0 0 30px;
+}
+
+.user-card-wrapper {
+    text-decoration: none;
+}
+
+/* MODAL */
+.modal-wrapper,
+.user-modal {
+    display: none;
+}
+
+.user-modal{
+    display: flex;
+    gap: 2rem;
+    box-shadow: 0 0 10px var(--third-color);
+}
+
+.user-modal img{
+    border-radius: var(--rounded-sm);
+    box-shadow: 0 0 10px var(--third-color);
 }

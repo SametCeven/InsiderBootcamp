@@ -3,11 +3,12 @@ $(document).ready(() => {
     let error = null;
     let isFetching = false;
     const results = 6;
-    const $userWrapper = $(".user-wrapper")
+    const $userWrapper = $(".user-wrapper");
+    const $modalWrapper = $(".modal-wrapper");
 
 
     // GETTING DATA FROM RANDOMUSER
-    function getData(url, results) {
+    function getData(results) {
         const baseUrl = `https://randomuser.me/api/?results=${results}`;
         isFetching = true;
 
@@ -28,33 +29,53 @@ $(document).ready(() => {
 
     // UTIL FUNCTION FOR ADDING DATA TO DOM
     function renderUsers(users) {
-        users.forEach((user) => {
+        users.forEach((user, index) => {
+
+            const modalId = `user-${index}`;
+            const userModal =
+                `
+                <div class="user-modal fancybox-content" id="${modalId}">
+                    <img src="${user.picture.large}"/>
+                    <div>
+                        <h2>${user.name.title} ${user.name.first} ${user.name.last}</h2>
+                        <p>Email: ${user.email}</p>
+                        <p>Location: ${user.location.city}, ${user.location.country}</p>
+                        <p>Phone: ${user.phone}</p>
+                    </div
+                </div>
+                `;
+            $modalWrapper.append(userModal);
+
             const $userCard =
                 $(`
-                <div class="user-card">
+                <a href="javascript:;" data-fancybox="users" data-src="#${modalId}" class="user-card">
                     <img src="${user.picture.large}"/>
                     <div class="user-card-info">
                         <h2> ${user.name.title}. ${user.name.first} ${user.name.last} </h2>
                         <span> ${user.email} </span>
                         <span> ${user.location.country} </span>
                     </div>
-                </div>
+                </a>
                 `);
-            $userWrapper.append($userCard);
-            $userCard.fadeIn("slow");
+
+            $userWrapper.append($userCard.hide().fadeIn("slow"));
             $userCard.hover(
-                function(){
-                    $(this).addClass("hovered")
+                function () {
+                    $(this).addClass("hovered");
                 },
-                function(){
-                    $(this).removeClass("hovered")
+                function () {
+                    $(this).removeClass("hovered");
                 })
-        })
+
+
+        });
+
+        Fancybox.bind("[data-fancybox='users']");
     }
 
 
     // GETTING DATA WHEN PAGE IS INITIALIZED
-    getData("", results);
+    getData(results);
 
 
 
