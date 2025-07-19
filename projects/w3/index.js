@@ -17,6 +17,7 @@
         cartContainer: "cart-container",
         cartPContainer: "cart-product-container",
         cartP: "cart-product",
+        cartButtonContainer: "cart-button-container",
     };
 
     const selectors = {
@@ -46,6 +47,8 @@
         cartPH4: `.${classes.cartP} h4`,
         cartPp: `.${classes.cartP} p`,
         cartSpan: `.${classes.cartP} span`,
+        cartButtonContainer: `.${classes.cartButtonContainer}`,
+        cartButtons: `.${classes.cartButtonContainer} button`,
     };
 
     const self = {
@@ -285,8 +288,10 @@
             width: 3rem;
         }
 
-        ${selectors.cartSpan}{
-            wdith: 3rem;
+        ${selectors.cartButtonContainer}{
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
         }
 
       </style>
@@ -321,11 +326,11 @@
 
         // CLICK EVENT FOR ADDING TO CART
         $(document).on('click.eventListener', selectors.cartLogo, function (e) {
-            const target = $(e.currentTarget);
-            const isHeaderCart = target.closest(selectors.headerNav).length > 0;
+            const $target = $(e.currentTarget);
+            const isHeaderCart = $target.closest(selectors.headerNav).length > 0;
             if (isHeaderCart) return;
 
-            const $pCard = target.closest(selectors.pCard);
+            const $pCard = $target.closest(selectors.pCard);
             const id = $pCard.data("id");
             const imageSrc = $pCard.find("img").attr("src");
             const title = $pCard.find("h2").text();
@@ -357,24 +362,50 @@
                 }
             }, 200)
         })
+
+        // INCREASE & DECREASE CART COUNT BUTTONS
+        $(document).on("click.eventListener",selectors.cartButtons, function(e){
+            const $target = $(e.currentTarget);
+            const $cartP = $target.closest(selectors.cartP);
+            const id = $cartP.data("id");
+            const itemToUpdate = self.cartStorage.find((p)=> p.id === id) 
+            const action = $target.data("action");
+
+            if(action === "+"){
+                itemToUpdate.count++;
+            }else if(action === "-"){
+                if(itemToUpdate.count === 1){
+                    $cartP.remove();
+                    self.removeFromCartStorage(id);
+                }
+                itemToUpdate.count--;
+            }
+            self.updateCartItemCount(itemToUpdate);
+            self.setCartStorage();
+        }) 
     };
 
     self.setCartStorage = () => {
         localStorage.setItem("cartStorage", JSON.stringify(self.cartStorage));
     };
 
+    self.getCartStorage = () => {
+        const storedCartData = JSON.parse(localStorage.getItem("cartStorage"));
+        if (storedCartData.length > 0) {
+            self.cartStorage = storedCartData;
+            $(selectors.cartPContainer).empty();
+            storedCartData.forEach(self.renderCartItem);
+        }
+    }
+
+    self.removeFromCartStorage = (id) => {
+        self.cartStorage = self.cartStorage.filter((p)=> p.id !==id);
+        self.setCartStorage()
+    }
+
     self.setFavoritesStorage = () => {
 
     };
-
-    self.getCartStorage = () => {
-        const storedData = JSON.parse(localStorage.getItem("cartStorage"));
-        if (storedData.length > 0) {
-            self.cartStorage = storedData;
-            $(selectors.cartPContainer).empty();
-            storedData.forEach(self.renderCartItem);
-        }
-    }
 
     // FETCHING DATA
     self.getData = () => {
@@ -435,7 +466,11 @@
                     <img src="${productData.imageSrc}"/>
                     <h4> ${productData.title} </h4>
                     <p> ${productData.price} </p>
-                    <span> ${productData.count} </span>
+                    <div class=${classes.cartButtonContainer}>
+                        <button class=${classes.btn1} data-action="-"> - </button>
+                        <span> ${productData.count} </span>
+                        <button class=${classes.btn1} data-action="+"> + </button>
+                    </div>
                 </div>
                 `
         $(selectors.cartPContainer).append(html);
@@ -448,6 +483,12 @@
         self.setCartStorage();
     }
 
+    // UPDATING CART ITEM'S COUNT
+    self.updateCartItemCount = (productData) => {
+        console.log(productData)
+        const $cartItem = $(`${selectors.cartP}[data-id="${productData.id}"]`)
+        $cartItem.find("span").text(productData.count);
+    }
 
 
     $(document).ready(self.init);
