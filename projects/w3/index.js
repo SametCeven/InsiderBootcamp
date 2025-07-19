@@ -6,6 +6,7 @@
     const classes = {
         style: 'custom-style',
         wrapper: 'wrapper',
+        headerNav: "header-nav",
         pContainer: "product-container",
         pCard: "product-card",
         pInfo: "product-info",
@@ -13,6 +14,9 @@
         pButtonContainer: "product-button-container",
         btn1: "btn-primary",
         logo: "logo",
+        cartContainer: "cart-container",
+        cartPContainer: "cart-product-container",
+        cartP: "cart-product",
     };
 
     const selectors = {
@@ -20,6 +24,8 @@
         style: `.${classes.style}`,
         wrapper: `.${classes.wrapper}`,
         header: `header`,
+        headerNav: `.${classes.headerNav}`,
+        headerNavCartLogo: `header svg[data-action=cart]`,
         pContainer: `.${classes.pContainer}`,
         pCard: `.${classes.pCard}`,
         pInfo: `.${classes.pInfo}`,
@@ -30,9 +36,26 @@
         pPrice: `.${classes.pInfo2} p`,
         btn1: `.${classes.btn1}`,
         logo: `.${classes.logo}`,
+        cartLogo: `[data-action=cart]`,
+        cart: `${classes.cart}`,
+        main: `main`,
+        cartContainer: `.${classes.cartContainer}`,
+        cartPContainer: `.${classes.cartPContainer}`,
+        cartP: `.${classes.cartP}`,
+        cartPImg: `.${classes.cartP} img`,
+        cartPH4: `.${classes.cartP} h4`,
+        cartPp: `.${classes.cartP} p`,
+        cartSpan: `.${classes.cartP} span`,
     };
 
     const self = {
+        loading: false,
+        error: null,
+        productData: [],
+        cartStorage: [],
+    };
+
+    const logos = {
         cartLogo: `
                 <svg class="logo" data-action="cart" xmlns="http://www.w3.org/2000/svg" 
                     width="24" height="24" viewBox="0 0 24 24" 
@@ -44,7 +67,6 @@
                         a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
                 </svg>
             `,
-
         favLogo: `
                 <svg class="logo" data-action="fav" xmlns="http://www.w3.org/2000/svg" 
                     width="24" height="24" viewBox="0 0 24 24" 
@@ -58,7 +80,6 @@
                 <path d="M18 12v6"/>
                 </svg>
             `,
-
         detailLogo: `
                 <svg class="logo" data-action="detail" xmlns="http://www.w3.org/2000/svg" 
                     width="24" height="24" viewBox="0 0 24 24" 
@@ -71,9 +92,6 @@
                 <path d="M3 20l3-3-3-3"/>
                 </svg>
             `,
-        loading: false,
-        error: null,
-        productData: [],
     };
 
     self.init = () => {
@@ -82,6 +100,7 @@
         self.buildHTML();
         self.setEvents();
         self.getData();
+        self.getCartStorage();
     };
 
     self.reset = () => {
@@ -116,6 +135,21 @@
         ${selectors.header}{
             margin-bottom: 3rem;
             color: ${root["secondary-color"]};
+            font-size: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        ${selectors.headerNav}{
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        ${selectors.main}{
+            display:flex;
+            justfiy-content: space-between;
         }
 
         ${selectors.pContainer} {
@@ -135,7 +169,8 @@
             height: 20rem;
             box-shadow: 0 0 5px ${root["primary-color"]};
             cursor: pointer;    
-            transition: all 0.3s ease;    
+            transition: all 0.3s ease;   
+            overflow:hidden; 
         }
 
         ${selectors.pCard}:hover{
@@ -144,12 +179,16 @@
         }
 
         ${selectors.pCardH2}{
-            font-size: 20px;
+            font-size: 14px;
+            text-align: right;
         }
 
         ${selectors.pCardImg}{
-            width: 10rem;
+            max-width: 10rem;
+            max-height: 100%;
+            width: auto;
             height: auto;
+            object-fit: contain;
         }
 
         ${selectors.pInfo}{
@@ -205,6 +244,50 @@
             color: ${root["fourth-color"]};
         }
 
+        ${selectors.cartContainer}{
+            margin-right: 3rem;
+            position: relative;
+        }
+
+        ${selectors.cartPContainer}{
+            display:none;
+            position:absolute;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            font-size: smaller;
+            right: 10px;
+            color: ${root["primary-color"]};
+            background-color: ${root["fourth-color"]};
+            border-radius: ${root["rounded-sm"]};
+            border: 1px solid ${root["primary-color"]};
+            box-shadow: 0 0 10px ${root["primary-color"]};
+        }
+
+        ${selectors.cartP}{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem;
+            font-size: 10px;
+        }
+
+        ${selectors.cartPImg}{
+            width: 5rem;
+        }
+
+        ${selectors.cartPH4}{
+            width: 8rem;
+        }
+
+        ${selectors.cartPp}{
+            width: 3rem;
+        }
+
+        ${selectors.cartSpan}{
+            wdith: 3rem;
+        }
 
       </style>
     `;
@@ -217,6 +300,13 @@
         <div class=${classes.wrapper}>
             <header>
                 <h1> Products </h1>
+                <nav class=${classes.headerNav}>
+                    <div class=${classes.cartContainer}> 
+                        ${logos.cartLogo}
+                        <div class=${classes.cartPContainer}></div>
+                    </div>
+                    ${logos.favLogo}
+                </nav>
             </header>
             <main>
                 <div class=${classes.pContainer}></div>
@@ -229,16 +319,64 @@
 
     self.setEvents = () => {
 
+        // CLICK EVENT FOR ADDING TO CART
+        $(document).on('click.eventListener', selectors.cartLogo, function (e) {
+            const target = $(e.currentTarget);
+            const isHeaderCart = target.closest(selectors.headerNav).length > 0;
+            if (isHeaderCart) return;
+
+            const $pCard = target.closest(selectors.pCard);
+            const id = $pCard.data("id");
+            const imageSrc = $pCard.find("img").attr("src");
+            const title = $pCard.find("h2").text();
+            const price = $pCard.find(selectors.pPrice).text();
+            const productData = { id, imageSrc, title, price, count: 1 };
+            const item = self.cartStorage.find((c) => c.id === id);
+
+            if (item) {
+                item.count++;
+                const $itemCountSpan = $(`${selectors.cartP}[data-id=${id}] span`)
+                $itemCountSpan.text(`${item.count}`);
+            } else {
+                self.addToCart(productData);
+            }
+            self.setCartStorage();
+        });
+
+        // HEADER CART LOGO MOUSEENTER DROPDOWN
+        $(document).on('mouseenter.eventListener', selectors.headerNavCartLogo, function (e) {
+            $(selectors.cartPContainer).stop(true, true).fadeIn(100);
+        })
+
+        // HEADER CART LOGO MOUSELEAVE DROPDOWN
+        $(document).on("mouseleave.eventListener", `${selectors.headerNavCartLogo}, ${selectors.cartPContainer}`, function (e) {
+            setTimeout(() => {
+                if (!$(selectors.cartPContainer).is(":hover")
+                    && !$(selectors.headerNavCartLogo).is(":hover")) {
+                    $(selectors.cartPContainer).fadeOut(100);
+                }
+            }, 200)
+        })
     };
 
     self.setCartStorage = () => {
-
+        localStorage.setItem("cartStorage", JSON.stringify(self.cartStorage));
     };
 
     self.setFavoritesStorage = () => {
 
     };
 
+    self.getCartStorage = () => {
+        const storedData = JSON.parse(localStorage.getItem("cartStorage"));
+        if (storedData.length > 0) {
+            self.cartStorage = storedData;
+            $(selectors.cartPContainer).empty();
+            storedData.forEach(self.renderCartItem);
+        }
+    }
+
+    // FETCHING DATA
     self.getData = () => {
         const baseUrl = `https://fakestoreapi.com/products`;
         self.loading = true;
@@ -261,21 +399,22 @@
         })
     }
 
+    // ADDING ITEMS TO DOM
     self.renderProducts = () => {
         if (!self.loading) {
             self.productData.forEach((product) => {
                 const html =
                     `
-                <div class = ${classes.pCard}>
+                <div class = ${classes.pCard} data-id=${product.id}>
                     <img src = "${product.image}"/>
                     <div class = ${classes.pInfo}>
                         <h2> ${product.title} </h2>
                         <div class = ${classes.pInfo2}>
-                            <p> ${product.price} $ </p>
+                            <p> ${product.price.toFixed(2)} $ </p>
                             <div class = ${classes.pButtonContainer}>
-                                ${self.cartLogo}
-                                ${self.favLogo}
-                                ${self.detailLogo}
+                                ${logos.cartLogo}
+                                ${logos.favLogo}
+                                ${logos.detailLogo}
                             </div>
                         </div>
                     </div>
@@ -287,6 +426,29 @@
 
         }
     }
+
+    // ADDING CART ITEMS TO DOM
+    self.renderCartItem = (productData) => {
+        const html =
+            `
+                <div class=${classes.cartP} data-id="${productData.id}">
+                    <img src="${productData.imageSrc}"/>
+                    <h4> ${productData.title} </h4>
+                    <p> ${productData.price} </p>
+                    <span> ${productData.count} </span>
+                </div>
+                `
+        $(selectors.cartPContainer).append(html);
+    }
+
+    // ADDING ITEMS TO CART
+    self.addToCart = (productData) => {
+        self.cartStorage.push(productData);
+        self.renderCartItem(productData);
+        self.setCartStorage();
+    }
+
+
 
     $(document).ready(self.init);
 
