@@ -18,13 +18,18 @@
         appendLocation: '#container' // Append location for the HTML - Don't change this.
     };
 
-    const self = {};
+    const self = {
+        loading : false,
+        error : null,
+        productData: [],
+    };
 
     self.init = () => {
         self.reset();
         self.buildCSS();
         self.buildHTML();
         self.setEvents();
+        self.getData();
     };
 
     self.reset = () => {
@@ -34,34 +39,47 @@
     };
 
     self.buildCSS = () => {
+
+        // Defining reusable css properties
+        const root = {
+            "primary-color": "#222831",
+            "secondary-color": "#010202",
+            "third-color": "#EEEEEE",
+            "error-color": "#850505",
+            "rounded-sm": "5px",
+            "rounded-md": "10px",
+            "primary-font": "Arial",
+        }
+
         const customStyle = `
       <style class="${classes.style}">
         ${selectors.wrapper} {
-          display: flex;
-          justify-content: center;
-          padding: 10px;
-          background-color: #f1f12f;
+            font-family: ${root["primary-font"]};
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background-color: ${root["primary-color"]};
         }
 
         ${selectors.container} {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          align-items: center;
-          color: #000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            color: #000;
         }
 
         ${selectors.addToCartButton} {
-          padding: 8px 16px;
-          background-color: #3498db;
-          color: #fff;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         ${selectors.addToCartButton}:hover {
-          background-color: #2980b9;
+            background-color: #2980b9;
         }
       </style>
     `;
@@ -100,6 +118,27 @@
         console.log('Favorites updated in localStorage');
         // Add localStorage logic here if needed
     };
+
+    self.getData = () => {
+        const baseUrl = `https://fakestoreapi.com/products`;
+        self.loading = true;
+        self.error = null;
+        self.productData = [];
+
+        $.ajax({
+            url: baseUrl,
+            method: "GET",
+        }).done((res) => {
+            console.log(res)
+            self.productData = res;
+            //renderProducts(res);
+        }).fail((err) => {
+            self.error = err;
+            //renderError();
+        }).always(() => {
+            self.loading = false;
+        })
+    }
 
     $(document).ready(self.init);
 
