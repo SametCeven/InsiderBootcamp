@@ -12,6 +12,7 @@
         pInfo2: "product-info-2",
         pButtonContainer: "product-button-container",
         btn1: "btn-primary",
+        logo: "logo",
     };
 
     const selectors = {
@@ -22,14 +23,54 @@
         pContainer: `.${classes.pContainer}`,
         pCard: `.${classes.pCard}`,
         pInfo: `.${classes.pInfo}`,
+        pInfo2: `.${classes.pInfo2}`,
         pCardH2: `.${classes.pCard} h2`,
         pCardImg: `.${classes.pCard} img`,
         pButtonContainer: `.${classes.pButtonContainer}`,
         pPrice: `.${classes.pInfo2} p`,
         btn1: `.${classes.btn1}`,
+        logo: `.${classes.logo}`,
     };
 
     const self = {
+        cartLogo: `
+                <svg class="logo" data-action="cart" xmlns="http://www.w3.org/2000/svg" 
+                    width="24" height="24" viewBox="0 0 24 24" 
+                    fill="none" stroke="currentColor" stroke-width="2" 
+                    stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="21" r="1"/>
+                <circle cx="19" cy="21" r="1"/>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78
+                        a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+                </svg>
+            `,
+
+        favLogo: `
+                <svg class="logo" data-action="fav" xmlns="http://www.w3.org/2000/svg" 
+                    width="24" height="24" viewBox="0 0 24 24" 
+                    fill="none" stroke="currentColor" stroke-width="2" 
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13.5 19.5 12 21l-7-7
+                        c-1.5-1.45-3-3.2-3-5.5A5.5 5.5 0 0 1 7.5 3
+                        c1.76 0 3 .5 4.5 2 1.5-1.5 2.74-2 4.5-2
+                        a5.5 5.5 0 0 1 5.402 6.5"/>
+                <path d="M15 15h6"/>
+                <path d="M18 12v6"/>
+                </svg>
+            `,
+
+        detailLogo: `
+                <svg class="logo" data-action="detail" xmlns="http://www.w3.org/2000/svg" 
+                    width="24" height="24" viewBox="0 0 24 24" 
+                    fill="none" stroke="currentColor" stroke-width="2" 
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 12h11"/>
+                <path d="M10 18h11"/>
+                <path d="M10 6h11"/>
+                <path d="M3 10l3-3-3-3"/>
+                <path d="M3 20l3-3-3-3"/>
+                </svg>
+            `,
         loading: false,
         error: null,
         productData: [],
@@ -93,6 +134,13 @@
             width: 25rem;
             height: 20rem;
             box-shadow: 0 0 5px ${root["primary-color"]};
+            cursor: pointer;    
+            transition: all 0.3s ease;    
+        }
+
+        ${selectors.pCard}:hover{
+            border: 1px solid ${root["fourth-color"]};
+            box-shadow: 0 0 5px ${root["third-color"]};
         }
 
         ${selectors.pCardH2}{
@@ -111,15 +159,35 @@
             align-items: flex-end;
         }
 
+        ${selectors.pInfo2}{
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
         ${selectors.pPrice}{
             text-align: right;
-            color: ${root["secondary-color"]};
+            color: ${root["secondary-color"]};    
         }
 
         ${selectors.pButtonContainer}{
             display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            gap: 1rem;
+        }
+
+        ${selectors.logo}{
+            color: ${root["secondary-color"]};
+            stroke: ${root["secondary-color"]};
+            fill: ${root["fourth-color"]};
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        ${selectors.logo}:hover{
+            stroke: ${root["secondary-color"]};
+            color: ${root["secondary-color"]};
+            fill: ${root["secondary-color"]};
+            transform: scale(1.2);
         }
 
         ${selectors.btn1}{
@@ -205,9 +273,9 @@
                         <div class = ${classes.pInfo2}>
                             <p> ${product.price} $ </p>
                             <div class = ${classes.pButtonContainer}>
-                                <button class=${classes.btn1}> Add To Cart </button>
-                                <button class=${classes.btn1}> Add To Favorites </button>
-                                <button class=${classes.btn1}> Show Details </button>
+                                ${self.cartLogo}
+                                ${self.favLogo}
+                                ${self.detailLogo}
                             </div>
                         </div>
                     </div>
