@@ -13,6 +13,7 @@
         pInfo2: "product-info-2",
         pButtonContainer: "product-button-container",
         btn1: "btn-primary",
+        btne: "btn-empty",
         logo: "logo",
         cartContainer: "cart-container",
         cartPContainer: "cart-product-container",
@@ -49,6 +50,7 @@
         cartSpan: `.${classes.cartP} span`,
         cartButtonContainer: `.${classes.cartButtonContainer}`,
         cartButtons: `.${classes.cartButtonContainer} button`,
+        cartEmptyButton: `.${classes.btne}`,
     };
 
     const self = {
@@ -255,7 +257,6 @@
         ${selectors.cartPContainer}{
             display:none;
             position:absolute;
-            display: flex;
             flex-direction: column;
             gap: 2rem;
             font-size: smaller;
@@ -265,6 +266,7 @@
             border-radius: ${root["rounded-sm"]};
             border: 1px solid ${root["primary-color"]};
             box-shadow: 0 0 10px ${root["primary-color"]};
+            padding: 1rem;
         }
 
         ${selectors.cartP}{
@@ -294,6 +296,13 @@
             align-items: center;
         }
 
+        ${selectors.cartEmptyButton}{
+            display: none;
+            color: ${root["error-color"]};
+            width: 100%;
+            font-weight: bold;
+        }
+
       </style>
     `;
 
@@ -308,7 +317,7 @@
                 <nav class=${classes.headerNav}>
                     <div class=${classes.cartContainer}> 
                         ${logos.cartLogo}
-                        <div class=${classes.cartPContainer}></div>
+                        <div class=${classes.cartPContainer}> </div>
                     </div>
                     ${logos.favLogo}
                 </nav>
@@ -351,6 +360,7 @@
         // HEADER CART LOGO MOUSEENTER DROPDOWN
         $(document).on('mouseenter.eventListener', selectors.headerNavCartLogo, function (e) {
             $(selectors.cartPContainer).stop(true, true).fadeIn(100);
+            $(selectors.cartEmptyButton).stop(true, true).fadeIn(100);
         })
 
         // HEADER CART LOGO MOUSELEAVE DROPDOWN
@@ -359,22 +369,23 @@
                 if (!$(selectors.cartPContainer).is(":hover")
                     && !$(selectors.headerNavCartLogo).is(":hover")) {
                     $(selectors.cartPContainer).fadeOut(100);
+                    $(selectors.cartEmptyButton).fadeOut(100);
                 }
             }, 200)
         })
 
         // INCREASE & DECREASE CART COUNT BUTTONS
-        $(document).on("click.eventListener",selectors.cartButtons, function(e){
+        $(document).on("click.eventListener", selectors.cartButtons, function (e) {
             const $target = $(e.currentTarget);
             const $cartP = $target.closest(selectors.cartP);
             const id = $cartP.data("id");
-            const itemToUpdate = self.cartStorage.find((p)=> p.id === id) 
+            const itemToUpdate = self.cartStorage.find((p) => p.id === id)
             const action = $target.data("action");
 
-            if(action === "+"){
+            if (action === "+") {
                 itemToUpdate.count++;
-            }else if(action === "-"){
-                if(itemToUpdate.count === 1){
+            } else if (action === "-") {
+                if (itemToUpdate.count === 1) {
                     $cartP.remove();
                     self.removeFromCartStorage(id);
                 }
@@ -382,7 +393,15 @@
             }
             self.updateCartItemCount(itemToUpdate);
             self.setCartStorage();
-        }) 
+        })
+
+        // EMPTY CART EVENT
+        $(document).on("click.eventListener", selectors.cartEmptyButton, function (e) {
+            self.cartStorage = [];
+            $(selectors.cartPContainer).empty();
+            self.setCartStorage();
+            self.renderEmptyCartButton();
+        })
     };
 
     self.setCartStorage = () => {
@@ -395,12 +414,13 @@
             self.cartStorage = storedCartData;
             $(selectors.cartPContainer).empty();
             storedCartData.forEach(self.renderCartItem);
+            self.renderEmptyCartButton();
         }
     }
 
     self.removeFromCartStorage = (id) => {
-        self.cartStorage = self.cartStorage.filter((p)=> p.id !==id);
-        self.setCartStorage()
+        self.cartStorage = self.cartStorage.filter((p) => p.id !== id);
+        self.setCartStorage();
     }
 
     self.setFavoritesStorage = () => {
@@ -489,6 +509,13 @@
         const $cartItem = $(`${selectors.cartP}[data-id="${productData.id}"]`)
         $cartItem.find("span").text(productData.count);
     }
+
+    // ADDING EMPTY CART BUTTON TO DOM
+    self.renderEmptyCartButton = () => {
+        const $button = $(`<button class="${classes.btn1} ${classes.btne}"> Empty Cart </button>`)
+        $(selectors.cartPContainer).prepend($button);
+    }
+
 
 
     $(document).ready(self.init);
