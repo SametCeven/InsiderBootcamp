@@ -19,6 +19,8 @@
         cartPContainer: "cart-product-container",
         cartP: "cart-product",
         cartButtonContainer: "cart-button-container",
+        favoritesContainer: "favorites-container",
+        favoritesPContainer: "favorites-product-container",
     };
 
     const selectors = {
@@ -51,6 +53,11 @@
         cartButtonContainer: `.${classes.cartButtonContainer}`,
         cartButtons: `.${classes.cartButtonContainer} button`,
         cartEmptyButton: `.${classes.btne}`,
+        favoritesContainer: `.${classes.favoritesContainer}`,
+        favoritesPContainer: `.${classes.favoritesPContainer}`,
+        favoritesLogo: `[data-action=fav]`,
+        headerFavCartLogo: `header svg[data-action=fav]`,
+        favButtons: `.${classes.favoritesPContainer} button`,
     };
 
     const self = {
@@ -58,6 +65,7 @@
         error: null,
         productData: [],
         cartStorage: [],
+        favoritesStorage: [],
     };
 
     const logos = {
@@ -106,6 +114,7 @@
         self.setEvents();
         self.getData();
         self.getCartStorage();
+        self.getFavoritesStorage();
     };
 
     self.reset = () => {
@@ -303,6 +312,27 @@
             font-weight: bold;
         }
 
+        ${selectors.favoritesContainer}{
+            margin-right: 3rem;
+            position: relative;
+        }
+
+        ${selectors.favoritesPContainer}{
+            display:none;
+            position:absolute;
+            flex-direction: column;
+            gap: 2rem;
+            font-size: smaller;
+            right: 10px;
+            color: ${root["primary-color"]};
+            background-color: ${root["fourth-color"]};
+            border-radius: ${root["rounded-sm"]};
+            border: 1px solid ${root["primary-color"]};
+            box-shadow: 0 0 10px ${root["primary-color"]};
+            padding: 1rem;
+        }
+
+
       </style>
     `;
 
@@ -319,7 +349,10 @@
                         ${logos.cartLogo}
                         <div class=${classes.cartPContainer}> </div>
                     </div>
-                    ${logos.favLogo}
+                    <div class=${classes.favoritesContainer}>
+                        ${logos.favLogo}
+                        <div class=${classes.favoritesPContainer}></div>
+                    </div>
                 </nav>
             </header>
             <main>
@@ -402,6 +435,52 @@
             self.setCartStorage();
             self.renderEmptyCartButton();
         })
+
+        // CLICK EVENT FOR ADDING TO FAVORITES
+        $(document).on('click.eventListener', selectors.favoritesLogo, function (e) {
+            const $target = $(e.currentTarget);
+            const isHeaderFavorite = $target.closest(selectors.headerNav).length > 0;
+            if (isHeaderFavorite) return;
+
+            const $pCard = $target.closest(selectors.pCard);
+            const id = $pCard.data("id");
+            const imageSrc = $pCard.find("img").attr("src");
+            const title = $pCard.find("h2").text();
+            const price = $pCard.find(selectors.pPrice).text();
+            const productData = { id, imageSrc, title, price, count: 1 };
+            const item = self.favoritesStorage.find((c) => c.id === id);
+
+            if (!item) {
+                self.addToFavorites(productData);
+            }
+            self.setFavoritesStorage();
+        });
+
+        // HEADER FAV LOGO MOUSEENTER DROPDOWN
+        $(document).on('mouseenter.eventListener', selectors.headerFavCartLogo, function (e) {
+            $(selectors.favoritesPContainer).stop(true, true).fadeIn(100);
+        })
+
+        // HEADER FAV LOGO MOUSELEAVE DROPDOWN
+        $(document).on("mouseleave.eventListener", `${selectors.headerFavCartLogo}, ${selectors.favoritesPContainer}`, function (e) {
+            setTimeout(() => {
+                if (!$(selectors.favoritesPContainer).is(":hover")
+                    && !$(selectors.headerFavCartLogo).is(":hover")) {
+                    $(selectors.favoritesPContainer).fadeOut(100);
+                }
+            }, 200)
+        })
+
+        // REMOVE FAV ITEM
+        $(document).on("click.eventListener", selectors.favButtons, function (e) {
+            const $target = $(e.currentTarget);
+            const $cartP = $target.closest(selectors.cartP);
+            const id = $cartP.data("id");
+
+            $cartP.remove();
+            self.removeFromFavoritesStorage(id);
+            self.setFavoritesStorage();
+        })
     };
 
     self.setCartStorage = () => {
@@ -424,8 +503,22 @@
     }
 
     self.setFavoritesStorage = () => {
-
+        localStorage.setItem("favoritesStorage", JSON.stringify(self.favoritesStorage));
     };
+
+    self.getFavoritesStorage = () => {
+        const storedFavoritesData = JSON.parse(localStorage.getItem("favoritesStorage"));
+        if (storedFavoritesData.length > 0) {
+            self.favoritesStorage = storedFavoritesData;
+            $(selectors.favoritesPContainer).empty();
+            storedFavoritesData.forEach(self.renderFavoriteItems);
+        }
+    }
+
+    self.removeFromFavoritesStorage = (id) => {
+        self.favoritesStorage = self.favoritesStorage.filter((p) => p.id !== id);
+        self.setFavoritesStorage();
+    }
 
     // FETCHING DATA
     self.getData = () => {
@@ -514,6 +607,27 @@
     self.renderEmptyCartButton = () => {
         const $button = $(`<button class="${classes.btn1} ${classes.btne}"> Empty Cart </button>`)
         $(selectors.cartPContainer).prepend($button);
+    }
+
+    // ADDING FAVORITE ITEMS TO DOM
+    self.renderFavoriteItems = (productData) => {
+        const html =
+            `
+                <div class=${classes.cartP} data-id="${productData.id}">
+                    <img src="${productData.imageSrc}"/>
+                    <h4> ${productData.title} </h4>
+                    <p> ${productData.price} </p>
+                    <button class="${classes.btn1}"> Remove </button>
+                </div>
+                `
+        $(selectors.favoritesPContainer).append(html);
+    }
+
+    // ADDING ITEMS TO FAVORITES
+    self.addToFavorites = (productData) => {
+        self.favoritesStorage.push(productData);
+        self.renderFavoriteItems(productData);
+        self.setFavoritesStorage();
     }
 
 
