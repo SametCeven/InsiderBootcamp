@@ -36,6 +36,7 @@
         pCard: `.${classes.pCard}`,
         pInfo: `.${classes.pInfo}`,
         pInfo2: `.${classes.pInfo2}`,
+        pInfo2p: `.${classes.pInfo2} p`,
         pCardH2: `.${classes.pCard} h2`,
         pCardImg: `.${classes.pCard} img`,
         pButtonContainer: `.${classes.pButtonContainer}`,
@@ -68,6 +69,7 @@
         modalP: `.${classes.modal} p`,
         slider: `.${classes.slider}`,
         sliderImg: `.${classes.slider} img`,
+        productTemplate: `#product-template`,
     };
 
     const self = {
@@ -269,7 +271,7 @@
             transition: all 0.3s ease;
         }
 
-        ${selectors.btn1}:hover{
+        .btn-hover{
             background-color: ${root["primary-color"]};
             color: ${root["fourth-color"]};
         }
@@ -292,6 +294,7 @@
             border: 1px solid ${root["primary-color"]};
             box-shadow: 0 0 10px ${root["primary-color"]};
             padding: 1rem;
+            z-index: 99;
         }
 
         ${selectors.cartP}{
@@ -331,6 +334,7 @@
         ${selectors.favoritesContainer}{
             margin-right: 3rem;
             position: relative;
+            z-index:99;
         }
 
         ${selectors.favoritesPContainer}{
@@ -404,6 +408,17 @@
             <main>
                 <div class=${classes.pContainer}></div>
             </main>
+        </div>
+
+        <div id="product-template" class="${classes.pCard}" style="display:none;">
+            <img src="" alt="product image" />
+            <div class="${classes.pInfo}">
+                <h2></h2>
+                <div class="${classes.pInfo2}">
+                    <p></p>
+                    <div class="${classes.pButtonContainer}"></div>
+                </div>
+            </div>
         </div>
     `;
 
@@ -527,6 +542,16 @@
             self.removeFromFavoritesStorage(id);
             self.setFavoritesStorage();
         })
+
+        // BUTTON HOVER EFFECT
+        $(document).on("mouseenter.eventListener", `${selectors.btn1}, ${selectors.btne}`, function (e) {
+            const $target = $(e.currentTarget);
+            $target.toggleClass("btn-hover");
+        })
+        $(document).on("mouseleave.eventListener", `${selectors.btn1}, ${selectors.btne}`, function (e) {
+            const $target = $(e.currentTarget);
+            $target.toggleClass("btn-hover");
+        })
     };
 
     self.setCartStorage = () => {
@@ -583,7 +608,6 @@
             self.renderProducts();
         }).fail((err) => {
             self.error = err;
-            //renderError();
         }).always(() => {
             self.loading = false;
         })
@@ -592,38 +616,36 @@
     // ADDING ITEMS TO DOM
     self.renderProducts = () => {
         if (!self.loading) {
-            self.productData.forEach((product) => {
-                const productId = product.id;
-                const detailId = `detail-${productId}`;
+            const $template = $(selectors.productTemplate);
+            
+            self.productData.forEach((product, index) => {
+                const $clone = $template.clone();
 
-                const html =
+                $clone
+                    .removeAttr("id")
+                    .show()
+                    .attr("data-id", product.id);
+                
+                $clone.find("img")
+                    .attr("src", product.image)
+                    .attr("alt", product.title);
+                
+                $clone.find("h2").text(product.title);
+
+                $clone.find(selectors.pInfo2pf).text(`${product.price.toFixed(2)} $`);
+
+                $clone.find(`.${classes.pButtonContainer}`).html(
                     `
-                <div class = ${classes.pCard} data-id=${product.id}>
-                    <img src = "${product.image}"/>
-                    <div class = ${classes.pInfo}>
-                        <h2> ${product.title} </h2>
-                        <div class = ${classes.pInfo2}>
-                            <p> ${product.price.toFixed(2)} $ </p>
-                            <div class = ${classes.pButtonContainer}>
-                                ${logos.cartLogo}
-                                ${logos.favLogo}
-                                <a href="#${detailId}" data-fancybox data-action="detail"> ${logos.detailLogo} </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="${detailId}" class="${classes.modal}">
-                    <img src = "${product.image}"/>
-                    <div class = ${classes.pInfo}>
-                        <h2> ${product.title} </h2>
-                        <div class = ${classes.pInfo2}>
-                            <p> ${product.price.toFixed(2)} $ </p>
-                        </div>
-                    </div>
-                </div>
-            `
+                        ${logos.cartLogo}
+                        ${logos.favLogo}
+                        <a href="#detail-${product.id}" data-fancybox data-action="detail">
+                            ${logos.detailLogo}
+                        </a>
+                    `
+                );
 
-                $(selectors.pContainer).append(html)
+                $(selectors.pContainer).append($clone);
+                $clone.hide().delay(index*400).slideDown(800);
             });
 
             const sliderHtml = self.productData.map((p) =>
@@ -767,6 +789,15 @@
                 arrows: true,
                 dots: true,
             });
+        }
+    }
+
+    self.debounce = (func, wait) => {
+        let timeout;
+        return function (...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
         }
     }
 
