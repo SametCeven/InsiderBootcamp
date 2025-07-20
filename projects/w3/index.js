@@ -23,6 +23,7 @@
         favoritesPContainer: "favorites-product-container",
         modal: "modal",
         slider: "slider",
+        search: "search",
     };
 
     const selectors = {
@@ -70,6 +71,7 @@
         slider: `.${classes.slider}`,
         sliderImg: `.${classes.slider} img`,
         productTemplate: `#product-template`,
+        search: `.${classes.search}`
     };
 
     const self = {
@@ -81,6 +83,7 @@
         slickLoaded: false,
         slickReady: false,
         productDataLoaded: false,
+        filteredProductData: [],
     };
 
     const logos = {
@@ -381,6 +384,12 @@
             margin: 0 auto;
         }
 
+        ${selectors.search}{
+            padding: 0.5rem;
+            border-radius: ${root["rounded-sm"]};
+            border: 1px solid ${root["primary-color"]};
+        }
+
 
       </style>
     `;
@@ -402,6 +411,7 @@
                         ${logos.favLogo}
                         <div class=${classes.favoritesPContainer}></div>
                     </div>
+                    <input class=${classes.search} placeholder="Search..."></input>
                 </nav>
             </header>
             <section class=${classes.slider}></section>
@@ -552,6 +562,21 @@
             const $target = $(e.currentTarget);
             $target.toggleClass("btn-hover");
         })
+
+        // CHANGE EVENT FOR SEARCH FILTER
+        $(document).on("change.eventListener", selectors.search, self.debounce(function(e){
+            const $target = $(e.currentTarget)
+            const id = $target.val();
+            
+            if(!id){
+                $(selectors.pContainer).empty();
+                self.renderProducts();
+                return;
+            }
+            
+            $(selectors.pContainer).empty();
+            self.getFilteredData(id);
+        },300))
     };
 
     self.setCartStorage = () => {
@@ -614,11 +639,17 @@
     }
 
     // ADDING ITEMS TO DOM
-    self.renderProducts = () => {
+    self.renderProducts = (products = self.productData) => {
         if (!self.loading) {
+
+            if($(selectors.slider).hasClass("slick-initialized")){
+                $(selectors.slider).slick("unslick");
+            }
+
             const $template = $(selectors.productTemplate);
+            $(selectors.pContainer).empty();
             
-            self.productData.forEach((product, index) => {
+            products.forEach((product, index) => {
                 const $clone = $template.clone();
 
                 $clone
@@ -799,6 +830,28 @@
             clearTimeout(timeout);
             timeout = setTimeout(() => func.apply(context, args), wait);
         }
+    }
+
+    // FETCHING FILTERED DATA
+    self.getFilteredData = (id) => {
+        const baseUrl = `https://fakestoreapi.com/products/${id}`;
+        self.loading = true;
+        self.error = null;
+        self.filteredProductData = [];
+
+        $.ajax({
+            url: baseUrl,
+            method: "GET",
+        }).done((res) => {
+            console.log(res)
+            self.filteredProductData.push(res);
+            self.loading = false;
+            self.renderProducts(self.filteredProductData);
+        }).fail((err) => {
+            self.error = err;
+        }).always(() => {
+            self.loading = false;
+        })
     }
 
     $(document).ready(self.init);
