@@ -21,6 +21,7 @@
         cartButtonContainer: "cart-button-container",
         favoritesContainer: "favorites-container",
         favoritesPContainer: "favorites-product-container",
+        modal: "modal",
     };
 
     const selectors = {
@@ -58,6 +59,12 @@
         favoritesLogo: `[data-action=fav]`,
         headerFavCartLogo: `header svg[data-action=fav]`,
         favButtons: `.${classes.favoritesPContainer} button`,
+        modal: `.${classes.modal}`,
+        modalImg: `.${classes.modal} img`,
+        modalInfo: `.${classes.modal} .${classes.pInfo}`,
+        modalInfo2: `.${classes.modal} .${classes.pInfo2}`,
+        modalH2: `.${classes.modal} h2`,
+        modalP: `.${classes.modal} p`,
     };
 
     const self = {
@@ -109,6 +116,7 @@
 
     self.init = () => {
         self.reset();
+        self.loadFancybox();
         self.buildCSS();
         self.buildHTML();
         self.setEvents();
@@ -332,6 +340,19 @@
             padding: 1rem;
         }
 
+        ${selectors.modal}{
+            display:none;
+            justify-content: center;
+            align-items: center;
+            gap:3rem;
+        }
+
+        ${selectors.modalImg}{
+            width: 20rem;
+            height: auto;
+        }
+
+
 
       </style>
     `;
@@ -547,6 +568,9 @@
     self.renderProducts = () => {
         if (!self.loading) {
             self.productData.forEach((product) => {
+                const productId = product.id;
+                const detailId = `detail-${productId}`;
+
                 const html =
                     `
                 <div class = ${classes.pCard} data-id=${product.id}>
@@ -558,8 +582,17 @@
                             <div class = ${classes.pButtonContainer}>
                                 ${logos.cartLogo}
                                 ${logos.favLogo}
-                                ${logos.detailLogo}
+                                <a href="#${detailId}" data-fancybox data-action="detail"> ${logos.detailLogo} </a>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="${detailId}" class="${classes.modal}">
+                    <img src = "${product.image}"/>
+                    <div class = ${classes.pInfo}>
+                        <h2> ${product.title} </h2>
+                        <div class = ${classes.pInfo2}>
+                            <p> ${product.price.toFixed(2)} $ </p>
                         </div>
                     </div>
                 </div>
@@ -629,6 +662,19 @@
         self.renderFavoriteItems(productData);
         self.setFavoritesStorage();
     }
+
+    // UTIL FUNCTION FOR LOADING FANCYBOX
+    self.loadFancybox = () => {
+        const fancyCss = document.createElement("link");
+        fancyCss.rel = "stylesheet";
+        fancyCss.href = "https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css";
+
+        const fancyJs = document.createElement("script");
+        fancyJs.src = "https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js";
+
+        document.head.appendChild(fancyCss);
+        document.head.appendChild(fancyJs);
+    };
 
 
 
