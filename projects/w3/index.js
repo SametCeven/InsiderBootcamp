@@ -22,6 +22,7 @@
         favoritesContainer: "favorites-container",
         favoritesPContainer: "favorites-product-container",
         modal: "modal",
+        slider: "slider",
     };
 
     const selectors = {
@@ -65,6 +66,8 @@
         modalInfo2: `.${classes.modal} .${classes.pInfo2}`,
         modalH2: `.${classes.modal} h2`,
         modalP: `.${classes.modal} p`,
+        slider: `.${classes.slider}`,
+        sliderImg: `.${classes.slider} img`,
     };
 
     const self = {
@@ -73,6 +76,9 @@
         productData: [],
         cartStorage: [],
         favoritesStorage: [],
+        slickLoaded: false,
+        slickReady: false,
+        productDataLoaded: false,
     };
 
     const logos = {
@@ -117,6 +123,7 @@
     self.init = () => {
         self.reset();
         self.loadFancybox();
+        self.loadSlick();
         self.buildCSS();
         self.buildHTML();
         self.setEvents();
@@ -170,13 +177,14 @@
         }
 
         ${selectors.main}{
-            display:flex;
-            justfiy-content: space-between;
+            margin-top: 5rem;
+            
         }
 
         ${selectors.pContainer} {
             display: flex;
             flex-wrap: wrap;
+            justify-content: space-between;
             gap: 3rem;
         }
 
@@ -352,6 +360,22 @@
             height: auto;
         }
 
+        ${selectors.slider}{
+            border: 1px solid ${root["primary-color"]};
+            box-shadow: 0 0 10px ${root["primary-color"]};
+        }
+
+        ${selectors.slider} div{
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+        }
+
+        ${selectors.sliderImg}{
+            max-width: 5rem;
+            max-height: 5rem;
+            margin: 0 auto;
+        }
 
 
       </style>
@@ -376,6 +400,7 @@
                     </div>
                 </nav>
             </header>
+            <section class=${classes.slider}></section>
             <main>
                 <div class=${classes.pContainer}></div>
             </main>
@@ -599,8 +624,20 @@
             `
 
                 $(selectors.pContainer).append(html)
-            })
+            });
 
+            const sliderHtml = self.productData.map((p) =>
+                `
+                <div>
+                    <img src="${p.image}" alt="${p.title}"/>
+                </div>
+                `
+            ).join("");
+
+            $(selectors.slider).html(sliderHtml);
+            self.slickReady = true;
+            self.productDataLoaded = true;
+            if (self.slickLoaded) self.initSlider();
         }
     }
 
@@ -676,7 +713,62 @@
         document.head.appendChild(fancyJs);
     };
 
+    // UTIL FUNCTION FOR LOADING SLICK
+    self.loadSlick = () => {
+        const slickCss = document.createElement("link");
+        slickCss.rel = "stylesheet";
+        slickCss.href = "https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css";
+        document.head.appendChild(slickCss);
 
+        const slickThemeCss = document.createElement("link");
+        slickThemeCss.rel = "stylesheet";
+        slickThemeCss.href = "https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css";
+        document.head.appendChild(slickThemeCss);
+
+        const slickJs = document.createElement("script");
+        slickJs.src = "https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js";
+
+        slickJs.onload = () => {
+            self.slickLoaded = true;
+            if (self.productDataLoaded) self.initSlider();
+        }
+        document.head.appendChild(slickJs);
+    };
+
+
+    // UTIL FUNCTION FOR INITIALIZING SLICK WITH SETTINGS
+    self.initSlider = () => {
+        const $slider = $(selectors.slider);
+        const images = $slider.find("img");
+        let loaddedImages = 0;
+        if (images.length === 0) initSlick();
+
+        images.each(function () {
+            if (this.complete) {
+                imageLoaded();
+            } else {
+                $(this).on("load", imageLoaded).on("error", imageLoaded);
+            }
+        });
+
+        function imageLoaded() {
+            loaddedImages++;
+            if (loaddedImages === images.length) {
+                initSlick();
+            }
+        };
+
+        function initSlick() {
+            $slider.slick({
+                slidesToShow: 5,
+                slidesToScroll: 4,
+                autoplay: true,
+                autoplaySpeed: 2000,
+                arrows: true,
+                dots: true,
+            });
+        }
+    }
 
     $(document).ready(self.init);
 
