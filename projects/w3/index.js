@@ -314,11 +314,11 @@
         }
 
         ${selectors.cartPH4}{
-            width: 8rem;
+            width: 12rem;
         }
 
         ${selectors.cartPp}{
-            width: 3rem;
+            width: 5rem;
         }
 
         ${selectors.cartButtonContainer}{
@@ -332,6 +332,7 @@
             color: ${root["error-color"]};
             width: 100%;
             font-weight: bold;
+            font-size: 14px;
         }
 
         ${selectors.favoritesContainer}{
@@ -388,6 +389,7 @@
             padding: 0.5rem;
             border-radius: ${root["rounded-sm"]};
             border: 1px solid ${root["primary-color"]};
+            font-size: 12px;
         }
 
 
@@ -429,7 +431,8 @@
                     <div class="${classes.pButtonContainer}"></div>
                 </div>
             </div>
-        </div>
+        </div>   
+
     `;
 
         $(selectors.appendLocation).append(html);
@@ -564,19 +567,19 @@
         })
 
         // CHANGE EVENT FOR SEARCH FILTER
-        $(document).on("change.eventListener", selectors.search, self.debounce(function(e){
+        $(document).on("change.eventListener", selectors.search, self.debounce(function (e) {
             const $target = $(e.currentTarget)
             const id = $target.val();
-            
-            if(!id){
+
+            if (!id) {
                 $(selectors.pContainer).empty();
                 self.renderProducts();
                 return;
             }
-            
+
             $(selectors.pContainer).empty();
             self.getFilteredData(id);
-        },300))
+        }, 300))
     };
 
     self.setCartStorage = () => {
@@ -642,13 +645,13 @@
     self.renderProducts = (products = self.productData) => {
         if (!self.loading) {
 
-            if($(selectors.slider).hasClass("slick-initialized")){
+            if ($(selectors.slider).hasClass("slick-initialized")) {
                 $(selectors.slider).slick("unslick");
             }
 
             const $template = $(selectors.productTemplate);
             $(selectors.pContainer).empty();
-            
+
             products.forEach((product, index) => {
                 const $clone = $template.clone();
 
@@ -656,14 +659,14 @@
                     .removeAttr("id")
                     .show()
                     .attr("data-id", product.id);
-                
+
                 $clone.find("img")
                     .attr("src", product.image)
                     .attr("alt", product.title);
-                
+
                 $clone.find("h2").text(product.title);
 
-                $clone.find(selectors.pInfo2pf).text(`${product.price.toFixed(2)} $`);
+                $clone.find(selectors.pInfo2p).text(`${product.price.toFixed(2)} $`);
 
                 $clone.find(`.${classes.pButtonContainer}`).html(
                     `
@@ -676,7 +679,21 @@
                 );
 
                 $(selectors.pContainer).append($clone);
-                $clone.hide().delay(index*400).slideDown(800);
+                $clone.hide().delay(index * 400).slideDown(800);
+
+                const modalHtml = `
+                    <div id="detail-${product.id}" class=${classes.modal}>
+                        <img src="${product.image}" alt="${product.title}">
+                        <div class="${classes.pInfo}">
+                            <h2> ${product.title} </h2>
+                            <div class="${classes.pInfo2}">
+                                <p> ${product.description} </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                $(selectors.wrapper).append(modalHtml);
             });
 
             const sliderHtml = self.productData.map((p) =>
@@ -691,6 +708,9 @@
             self.slickReady = true;
             self.productDataLoaded = true;
             if (self.slickLoaded) self.initSlider();
+
+
+
         }
     }
 
