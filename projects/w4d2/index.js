@@ -19,13 +19,14 @@
         main: `main`,
         error: `.${classes.error}`,
         loading: `.${classes.loading}`,
-        haederH1: `header h1`,
+        headerH1: `header h1`,
     };
 
     const self = {
         loading: false,
         error: null,
         userData: [],
+        userDataStorage: {},
     };
 
     self.init = () => {
@@ -33,7 +34,7 @@
         self.buildCSS();
         self.buildHTML();
         self.setEvents();
-        self.getData();
+        self.getInitialData();
     };
 
     self.reset = () => {
@@ -69,7 +70,7 @@
             margin-bottom: 5rem;
         }
 
-        ${selectors.haederH1}{
+        ${selectors.headerH1}{
             font-size: 40px;
         }
 
@@ -90,7 +91,7 @@
 
     self.buildHTML = () => {
         const html =
-        `
+            `
             <header>
                 <h1> Users </h1>
             </header>
@@ -126,19 +127,20 @@
             })
             .then((data) => {
                 self.userData = data;
-                self.renderData(self.userData);
+                self.setLocalStorageData();
+                self.renderUserData();
             })
             .catch((err) => {
                 self.error = err;
                 self.renderError(err);
             })
-            .finally(()=> {
+            .finally(() => {
                 self.loading = false;
                 $(selectors.loading).remove();
             })
     };
 
-    self.renderData = (data) => {
+    self.renderUserData = () => {
         const p = `<p> hello </p>`
         $(selectors.main).append(p)
     }
@@ -151,6 +153,37 @@
     self.renderLoading = () => {
         const $loadingNotification = $(`<div class=${classes.loading}> Loading ... </div>`);
         $(selectors.main).append($loadingNotification);
+    }
+
+    self.getLocalStorageData = () => {
+        self.userDataStorage = JSON.parse(localStorage.getItem("userDataStorage"));
+    }
+
+    self.setLocalStorageData = () => {
+        self.userDataStorage = {
+            data: self.userData,
+            expirationDate: new Date(),
+        }
+        localStorage.setItem("userDataStorage",JSON.stringify(self.userDataStorage));
+    }
+
+    self.getInitialData = () => {
+        self.getLocalStorageData();
+
+        const currentDate = new Date();
+        let expirationDate;
+        const ms24H = 24 * 60 * 60 * 1000;
+
+        if (self.userDataStorage) {
+            expirationDate = new Date(self.userDataStorage.expirationDate);
+        }
+
+        if (!self.userDataStorage || currentDate - expirationDate > ms24H) {
+            self.getData();
+        } else {
+            self.userData = self.userDataStorage.data;
+            self.renderUserData();
+        }
     }
 
     $(document).ready(self.init);
