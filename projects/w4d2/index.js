@@ -6,14 +6,18 @@
     const classes = {
         style: 'custom-style',
         wrapper: 'ins-api-users',
-
+        error: "error",
+        loading: "loading",
     };
 
     const selectors = {
-        appendLocation: '#container', // Append location for the HTML - Don't change this.
+        appendLocation: `.${classes.wrapper}`,
         style: `.${classes.style}`,
         wrapper: `.${classes.wrapper}`,
-
+        header: `header`,
+        main: `main`,
+        error: `.${classes.error}`,
+        loading: `.${classes.loading}`,
     };
 
     const self = {
@@ -62,9 +66,14 @@
     };
 
     self.buildHTML = () => {
-        const html = 
+        const html =
         `
-        
+            <header>
+                <h1> Users </h1>
+            </header>
+            <main>
+
+            </main>
 
         `;
 
@@ -85,30 +94,41 @@
         self.error = null;
         self.userData = [];
 
-        $.ajax({
-            url: baseUrl,
-            method: "GET",
-        }).done((res) => {
-            console.log(res)
-            self.userData = res;
-            self.loading = false;
-            self.renderData(self.userData);
-        }).fail((err) => {
-            self.error = err;
-        }).always(() => {
-            self.loading = false;
-        })
-    }
+        self.renderLoading();
+
+        fetch(baseUrl)
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch users");
+                return res.json();
+            })
+            .then((data) => {
+                self.userData = data;
+                self.renderData(self.userData);
+            })
+            .catch((err) => {
+                self.error = err;
+                self.renderError(err);
+            })
+            .finally(()=> {
+                self.loading = false;
+                $(selectors.loading).remove();
+            })
+    };
 
     self.renderData = (data) => {
-        if(!self.loading){
-            console.log(1)
-            const p = `<p> hello </p>`
-            $(selectors.wrapper).append(p)
-
-        }
+        const p = `<p> hello </p>`
+        $(selectors.main).append(p)
     }
 
+    self.renderError = (err) => {
+        const $errorNotification = $(`<div class=${classes.error}> ${err} </div>`);
+        $(selectors.main).append($errorNotification);
+    }
+
+    self.renderLoading = () => {
+        const $loadingNotification = $(`<div class=${classes.loading}> Loading ... </div>`);
+        $(selectors.main).append($loadingNotification);
+    }
 
     $(document).ready(self.init);
 
