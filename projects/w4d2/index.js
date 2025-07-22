@@ -8,6 +8,10 @@
         wrapper: 'ins-api-users',
         error: "error",
         loading: "loading",
+        userWrapper: "user-wrapper",
+        userContainer: "user-container",
+        userInfo: "user-info",
+        btn: "btn",
     };
 
     const selectors = {
@@ -20,6 +24,14 @@
         error: `.${classes.error}`,
         loading: `.${classes.loading}`,
         headerH1: `header h1`,
+        userWrapper: `.${classes.userWrapper}`,
+        userContainer: `.${classes.userContainer}`,
+        userInfo: `.${classes.userInfo}`,
+        userContainerH2: `.${classes.userContainer} h2`,
+        userContainerH3: `.${classes.userContainer} h3`,
+        userContainerP: `.${classes.userContainer} p`,
+        userContainerSp: `.${classes.userContainer} span`,
+        btn: `.${classes.btn}`,
     };
 
     const self = {
@@ -82,6 +94,80 @@
             color: ${root["error-color"]};
         }
 
+        ${selectors.userWrapper}{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5rem;
+        }
+
+        ${selectors.userContainer}{
+            display: flex;
+            flex-direction: column;
+            width: 30%;
+            gap: 1rem;
+            border: 1px solid ${root["fourth-color"]};
+            box-shadow: 0 0 10px ${root["fourth-color"]};
+            padding: 1rem;
+        }
+
+        ${selectors.userContainerH2}{
+            color:${root["secondary-color"]};
+            background-color: ${root["fourth-color"]};
+            border-radius: ${root["rounded-sm"]};
+            padding: 0.5rem;
+            margin: 0;
+        }
+
+        ${selectors.userInfo}{
+            border: 1px solid ${root["secondary-color"]};
+            border-radius: ${root["rounded-sm"]};
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        ${selectors.userContainerH3}{
+            color:${root["fourth-color"]};
+            background-color: ${root["secondary-color"]};
+            border-radius: ${root["rounded-sm"]};
+            padding: 0.5rem;
+            margin: 0;
+        }
+
+        ${selectors.userContainerP}{
+            font-size: smaller;
+            display: flex;
+            justify-content: space-between;
+            text-align: right;
+            gap: 2rem;
+            border-bottom: 1px solid ${root["secondary-color"]};
+            padding-bottom: 0.5rem;
+        }
+
+        ${selectors.userContainerSp}{
+            font-weight: bold;
+            text-align: left;
+        }
+
+        ${selectors.btn}{
+            padding: 0.5rem;
+            border: 1px solid ${root["error-color"]};
+            border-radius: ${root["rounded-sm"]};
+            box-shadow: 0 0 10px ${root["error-color"]};
+            background-color: ${root["fourth-color"]};
+            color: ${root["error-color"]};
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        ${selectors.btn}:hover{
+            background-color: ${root["error-color"]};
+            color: ${root["fourth-color"]};
+        }
+
 
       </style>
     `;
@@ -96,7 +182,7 @@
                 <h1> Users </h1>
             </header>
             <main>
-
+                <div class=${classes.userWrapper}></div>
             </main>
 
         `;
@@ -111,7 +197,7 @@
 
 
 
-    // FETCH DATA
+    // UTIL FUNCTION TO FETCH DATA
     self.getData = () => {
         const baseUrl = `https://jsonplaceholder.typicode.com/users`;
         self.loading = true;
@@ -140,25 +226,53 @@
             })
     };
 
+    // UTIL FUNCTION TO ADD USERS TO DOM
     self.renderUserData = () => {
-        const p = `<p> hello </p>`
-        $(selectors.main).append(p)
+        self.userData.forEach((user)=>{
+            const $user = $(`
+                <div class=${classes.userContainer}>
+                    <h2> ${user.username} </h2>
+                    <div class=${classes.userInfo}>
+                        <h3> User Information </h3>
+                        <p> <span>Name: </span> ${user.name} </p>
+                        <p> <span>Company: </span> ${user.company.name} </p>
+                        <p> <span>Company Catch Phrase: </span> ${user.company.catchPhrase} </p>
+                    </div>
+                    <div class=${classes.userInfo}>
+                        <h3> Contact Information </h3>
+                        <p> <span>Email: </span> ${user.email} </p>
+                        <p> <span>Phone: </span> ${user.phone} </p>
+                        <p> <span>Website: </span> ${user.website} </p>
+                    </div>
+                    <button class=${classes.btn}> Delete User </button>
+                </div>
+            `)
+
+            $user.hide().fadeIn(500);
+            $(selectors.userWrapper).append($user)
+        })
+        
+        
     }
 
+    // UTIL FUNCTION TO RENDER ERROR NOTIFICATION
     self.renderError = (err) => {
         const $errorNotification = $(`<div class=${classes.error}> ${err} </div>`);
         $(selectors.main).append($errorNotification);
     }
 
+    // UTIL FUNCTION TO RENDER LOADING NOTIFICATION
     self.renderLoading = () => {
         const $loadingNotification = $(`<div class=${classes.loading}> Loading ... </div>`);
         $(selectors.main).append($loadingNotification);
     }
 
+    // UTIL FUNCTION TO GET LOCAL STORAGE DATA
     self.getLocalStorageData = () => {
         self.userDataStorage = JSON.parse(localStorage.getItem("userDataStorage"));
     }
 
+    // UTIL FUNCTION TO SET LOCAL STORAGE DATA
     self.setLocalStorageData = () => {
         self.userDataStorage = {
             data: self.userData,
@@ -167,6 +281,7 @@
         localStorage.setItem("userDataStorage",JSON.stringify(self.userDataStorage));
     }
 
+    // UTIL FUNCTION TO GET INITIAL DATA FROM STORAGE IF NOT FETCH
     self.getInitialData = () => {
         self.getLocalStorageData();
 
@@ -184,6 +299,7 @@
             self.userData = self.userDataStorage.data;
             self.renderUserData();
         }
+        console.log(self.userData)
     }
 
     $(document).ready(self.init);
