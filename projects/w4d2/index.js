@@ -14,10 +14,12 @@
         appendLocation: `.${classes.wrapper}`,
         style: `.${classes.style}`,
         wrapper: `.${classes.wrapper}`,
+        body: `body`,
         header: `header`,
         main: `main`,
         error: `.${classes.error}`,
         loading: `.${classes.loading}`,
+        haederH1: `header h1`,
     };
 
     const self = {
@@ -56,7 +58,28 @@
 
         const customStyle = `
       <style class="${classes.style}">
-        
+        ${selectors.body}{
+            font-family: ${root["primary-font"]};
+            background-color: ${root["primary-color"]};
+            color: ${root["fourth-color"]};
+            padding: 1rem 3rem;
+        }
+
+        ${selectors.header}{
+            margin-bottom: 5rem;
+        }
+
+        ${selectors.haederH1}{
+            font-size: 40px;
+        }
+
+        ${selectors.loading}{
+            color: ${root["secondary-color"]};
+        }
+
+        ${selectors.error}{
+            color: ${root["error-color"]};
+        }
 
 
       </style>
