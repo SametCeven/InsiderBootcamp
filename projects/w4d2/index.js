@@ -12,6 +12,8 @@
         userContainer: "user-container",
         userInfo: "user-info",
         btn: "btn",
+        accordionContent: "accordion-content",
+        accordionToggle: "accordion-toggle",
     };
 
     const selectors = {
@@ -32,6 +34,8 @@
         userContainerP: `.${classes.userContainer} p`,
         userContainerSp: `.${classes.userContainer} span`,
         btn: `.${classes.btn}`,
+        accordionContent: `.${classes.accordionContent}`,
+        accordionToggle: `.${classes.accordionToggle}`,
     };
 
     const self = {
@@ -104,7 +108,7 @@
         ${selectors.userContainer}{
             display: flex;
             flex-direction: column;
-            width: 30%;
+            width: 25%;
             gap: 1rem;
             border: 1px solid ${root["fourth-color"]};
             box-shadow: 0 0 10px ${root["fourth-color"]};
@@ -168,6 +172,16 @@
             color: ${root["fourth-color"]};
         }
 
+        ${selectors.accordionToggle}{
+            cursor: pointer;
+            user-select: none;
+        }
+
+        ${selectors.accordionContent}{
+            display: none;
+            transition: max-height 0.3s ease;
+        }
+
 
       </style>
     `;
@@ -198,6 +212,11 @@
                 $target.remove();
             });
             self.removeUserFromLocalStorage(id);
+        })
+
+        $(document).on("click.eventListener", selectors.accordionToggle, function(e){
+            const $target = $(e.currentTarget).next(selectors.accordionContent);
+            $target.slideToggle(300);
         })
 
     };
@@ -240,17 +259,21 @@
                 <div class=${classes.userContainer} data-id=${user.id}>
                     <h2> ${user.username} </h2>
                     <div class=${classes.userInfo}>
-                        <h3> User Information </h3>
-                        <p> <span>Name: </span> ${user.name} </p>
-                        <p> <span>Company: </span> ${user.company.name} </p>
-                        <p> <span>Company Catch Phrase: </span> ${user.company.catchPhrase} </p>
+                        <h3 class=${classes.accordionToggle}> User Information </h3>
+                        <div class=${classes.accordionContent}>
+                            <p> <span>Name: </span> ${user.name} </p>
+                            <p> <span>Company: </span> ${user.company.name} </p>
+                            <p> <span>Company Catch Phrase: </span> ${user.company.catchPhrase} </p>
+                        </div>
                     </div>
                     <div class=${classes.userInfo}>
-                        <h3> Contact Information </h3>
-                        <p> <span>Email: </span> ${user.email} </p>
-                        <p> <span>Phone: </span> ${user.phone} </p>
-                        <p> <span>Website: </span> ${user.website} </p>
-                        <p> <span>City: </span> ${user.address.city} </p>
+                        <h3 class=${classes.accordionToggle}> Contact Information </h3>
+                        <div class=${classes.accordionContent}>
+                            <p> <span>Email: </span> ${user.email} </p>
+                            <p> <span>Phone: </span> ${user.phone} </p>
+                            <p> <span>Website: </span> ${user.website} </p>
+                            <p> <span>City: </span> ${user.address.city} </p>
+                        </div>
                     </div>
                     <button class=${classes.btn}> Delete User </button>
                 </div>
