@@ -191,7 +191,14 @@
     };
 
     self.setEvents = () => {
-
+        $(document).on("click.eventListener", selectors.btn, function(e){
+            const $target = $(e.currentTarget).parent(selectors.userContainer);
+            const id = $target.data("id");
+            $target.fadeOut(400, ()=> {
+                $target.remove();
+            });
+            self.removeUserFromLocalStorage(id);
+        })
 
     };
 
@@ -230,7 +237,7 @@
     self.renderUserData = () => {
         self.userData.forEach((user)=>{
             const $user = $(`
-                <div class=${classes.userContainer}>
+                <div class=${classes.userContainer} data-id=${user.id}>
                     <h2> ${user.username} </h2>
                     <div class=${classes.userInfo}>
                         <h3> User Information </h3>
@@ -243,6 +250,7 @@
                         <p> <span>Email: </span> ${user.email} </p>
                         <p> <span>Phone: </span> ${user.phone} </p>
                         <p> <span>Website: </span> ${user.website} </p>
+                        <p> <span>City: </span> ${user.address.city} </p>
                     </div>
                     <button class=${classes.btn}> Delete User </button>
                 </div>
@@ -279,6 +287,13 @@
             expirationDate: new Date(),
         }
         localStorage.setItem("userDataStorage",JSON.stringify(self.userDataStorage));
+    }
+
+    // UTIL FUNCTION TO REMOVE USER FROM LOCAL STORAGE DATA
+    self.removeUserFromLocalStorage = (id) => {
+        const newUserData = self.userData.filter((u)=> u.id !== id);
+        self.userData = newUserData;
+        self.setLocalStorageData()
     }
 
     // UTIL FUNCTION TO GET INITIAL DATA FROM STORAGE IF NOT FETCH
