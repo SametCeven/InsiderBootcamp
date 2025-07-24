@@ -1,18 +1,18 @@
 // eslint-disable
 
 (() => {
-    const jquery = document.createElement("script");
-    jquery.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
-    
-    jquery.onload = () => {
+    const jqueryScript = document.createElement("script");
+    jqueryScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
+
+    jqueryScript.onload = () => {
         main(jQuery);
     }
 
-    document.head.appendChild(jquery);
+    document.head.appendChild(jqueryScript);
 })();
 
 
-function main ($) {
+function main($) {
     'use strict';
 
     const classes = {
@@ -25,6 +25,7 @@ function main ($) {
         btn: "btn",
         accordionContent: "accordion-content",
         accordionToggle: "accordion-toggle",
+        btnr: "btn-r",
     };
 
     const selectors = {
@@ -47,6 +48,7 @@ function main ($) {
         btn: `.${classes.btn}`,
         accordionContent: `.${classes.accordionContent}`,
         accordionToggle: `.${classes.accordionToggle}`,
+        btnr: `.${classes.btnr}`,
     };
 
     const self = {
@@ -62,6 +64,7 @@ function main ($) {
         self.buildHTML();
         self.setEvents();
         self.getInitialData();
+        self.setObserver();
     };
 
     self.reset = () => {
@@ -192,6 +195,23 @@ function main ($) {
             transition: max-height 0.3s ease;
         }
 
+        ${selectors.btnr}{
+            padding: 0.5rem;
+            border: 1px solid ${root["secondary-color"]};
+            border-radius: ${root["rounded-sm"]};
+            box-shadow: 0 0 10px ${root["secondary-color"]};
+            background-color: ${root["fourth-color"]};
+            color: ${root["secondary-color"]};
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        ${selectors.btnr}:hover{
+            background-color: ${root["secondary-color"]};
+            color: ${root["fourth-color"]};
+        }
+
 
       </style>
     `;
@@ -215,7 +235,7 @@ function main ($) {
     };
 
     self.setEvents = () => {
-        $(document).on("click.eventListener", selectors.btn, function (e) {
+        $(document).on("click.eventListener", selectors.btn, (e) => {
             const $target = $(e.currentTarget).parent(selectors.userContainer);
             const id = $target.data("id");
             $target.fadeOut(400, () => {
@@ -224,9 +244,13 @@ function main ($) {
             self.removeUserFromLocalStorage(id);
         })
 
-        $(document).on("click.eventListener", selectors.accordionToggle, function (e) {
+        $(document).on("click.eventListener", selectors.accordionToggle, (e) => {
             const $target = $(e.currentTarget).next(selectors.accordionContent);
             $target.slideToggle(300);
+        })
+
+        $(document).on("click.eventListener", selectors.btnr, (e) => {
+            self.getData();
         })
 
     };
@@ -240,7 +264,7 @@ function main ($) {
         self.userData = [];
 
         self.renderLoading();
-
+        
         fetch(baseUrl)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch users");
@@ -262,6 +286,9 @@ function main ($) {
     };
 
     self.renderUserData = () => {
+
+        $(selectors.btnr).remove();
+
         self.userData.forEach((user) => {
             const $user = $(`
                 <div class=${classes.userContainer} data-id=${user.id}>
@@ -341,6 +368,32 @@ function main ($) {
         console.log(self.userData)
     }
 
+    self.setObserver = () => {
+        const userWrapper = $(selectors.userWrapper)[0];
+
+        const config = {
+            childList: true,
+        }
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === "childList" && mutation.removedNodes.length) {
+                    if (mutation.target.children.length === 0) {
+                        self.renderRefreshButton();
+                    }
+                }
+            })
+        })
+
+        observer.observe(userWrapper, config)
+    }
+
+    self.renderRefreshButton = () => {
+        const $refreshButton = $(`
+            <button class=${classes.btnr}> Fetch User Data </button>    
+        `)
+        $(selectors.userWrapper).append($refreshButton);
+    }
 
 
     $(document).ready(self.init);
