@@ -12,7 +12,7 @@
 })();
 
 
-function main($) {
+main = ($) => {
     'use strict';
 
     const classes = {
