@@ -366,7 +366,6 @@ main = ($) => {
             self.userData = self.userDataStorage.data;
             self.renderUserData();
         }
-        console.log(self.userData)
     }
 
     self.setObserver = () => {
@@ -405,7 +404,6 @@ main = ($) => {
     }
 
     self.getRefreshButtonSessionStorage = () => {
-        console.log(JSON.parse(sessionStorage.getItem("refreshButtonUsed")))
         return JSON.parse(sessionStorage.getItem("refreshButtonUsed"));
     }
 
