@@ -1,11 +1,22 @@
 // eslint-disable
 
-(($) => {
+(() => {
+    const jquery = document.createElement("script");
+    jquery.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
+    
+    jquery.onload = () => {
+        main(jQuery);
+    }
+
+    document.head.appendChild(jquery);
+})();
+
+
+function main ($) {
     'use strict';
 
     const classes = {
         style: 'custom-style',
-        wrapper: 'ins-api-users',
         error: "error",
         loading: "loading",
         userWrapper: "user-wrapper",
@@ -17,7 +28,7 @@
     };
 
     const selectors = {
-        appendLocation: `.${classes.wrapper}`,
+        appendLocation: `.ins-api-users`,
         style: `.${classes.style}`,
         wrapper: `.${classes.wrapper}`,
         body: `body`,
@@ -204,16 +215,16 @@
     };
 
     self.setEvents = () => {
-        $(document).on("click.eventListener", selectors.btn, function(e){
+        $(document).on("click.eventListener", selectors.btn, function (e) {
             const $target = $(e.currentTarget).parent(selectors.userContainer);
             const id = $target.data("id");
-            $target.fadeOut(400, ()=> {
+            $target.fadeOut(400, () => {
                 $target.remove();
             });
             self.removeUserFromLocalStorage(id);
         })
 
-        $(document).on("click.eventListener", selectors.accordionToggle, function(e){
+        $(document).on("click.eventListener", selectors.accordionToggle, function (e) {
             const $target = $(e.currentTarget).next(selectors.accordionContent);
             $target.slideToggle(300);
         })
@@ -251,7 +262,7 @@
     };
 
     self.renderUserData = () => {
-        self.userData.forEach((user)=>{
+        self.userData.forEach((user) => {
             const $user = $(`
                 <div class=${classes.userContainer} data-id=${user.id}>
                     <h2> ${user.username} </h2>
@@ -279,8 +290,7 @@
             $user.hide().fadeIn(500);
             $(selectors.userWrapper).append($user)
         })
-        
-        
+
     }
 
     self.renderError = (err) => {
@@ -302,11 +312,11 @@
             data: self.userData,
             expirationDate: new Date(),
         }
-        localStorage.setItem("userDataStorage",JSON.stringify(self.userDataStorage));
+        localStorage.setItem("userDataStorage", JSON.stringify(self.userDataStorage));
     }
 
     self.removeUserFromLocalStorage = (id) => {
-        const newUserData = self.userData.filter((u)=> u.id !== id);
+        const newUserData = self.userData.filter((u) => u.id !== id);
         self.userData = newUserData;
         self.setLocalStorageData()
     }
@@ -331,6 +341,9 @@
         console.log(self.userData)
     }
 
+
+
     $(document).ready(self.init);
 
-})(jQuery);
+
+};
