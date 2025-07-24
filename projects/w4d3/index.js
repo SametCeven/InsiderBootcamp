@@ -250,6 +250,7 @@ function main($) {
         })
 
         $(document).on("click.eventListener", selectors.btnr, (e) => {
+            self.toggleRefreshButtonSessionStorage();
             self.getData();
         })
 
@@ -378,7 +379,7 @@ function main($) {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === "childList" && mutation.removedNodes.length) {
-                    if (mutation.target.children.length === 0) {
+                    if (mutation.target.children.length === 0 && !self.getRefreshButtonSessionStorage()) {
                         self.renderRefreshButton();
                     }
                 }
@@ -394,6 +395,21 @@ function main($) {
         `)
         $(selectors.userWrapper).append($refreshButton);
     }
+
+    self.toggleRefreshButtonSessionStorage = () => {
+        if(self.getRefreshButtonSessionStorage()){
+            sessionStorage.setItem("refreshButtonUsed", "false");
+        }else{
+            sessionStorage.setItem("refreshButtonUsed", "true");
+        };
+    }
+
+    self.getRefreshButtonSessionStorage = () => {
+        console.log(JSON.parse(sessionStorage.getItem("refreshButtonUsed")))
+        return JSON.parse(sessionStorage.getItem("refreshButtonUsed"));
+    }
+
+    
 
 
     $(document).ready(self.init);
