@@ -15,6 +15,7 @@ main = ($) => {
         boxContainer: "box-container",
         box: "box",
         panel: "panel",
+        inputContainer: "input-container",
         panelLabel: "panel-label",
         panelInput: "panel-input",
         panelInputContainer: "panel-input-container",
@@ -31,29 +32,31 @@ main = ($) => {
         body: `body`,
         box: `.${classes.box}`,
         panel: `.${classes.panel}`,
+        inputContainer: `.${classes.inputContainer}`,
         panelLabel: `.${classes.panelLabel}`,
         panelInput: `.${classes.panelInput}`,
         panelInputContainer: `.${classes.panelInputContainer}`,
         btn: `.${classes.btn}`,
         toastContainer: `.${classes.toastContainer}`,
         iconSuccess: `.${classes.iconSuccess}`,
+        panelTitle: `.${classes.panel} h2`,
     }
 
     const self = {
         boxProps: {},
         inputs: [
-            {"title": "Background Color", "type": "color"},
-            {"title": "Text Color", "type": "color"},
-            {"title": "Width", "type": "range", "min": 0, "max": 300, "placeholder": "Enter px value", "span": true},
-            {"title": "Height", "type": "range", "min": 0, "max": 300, "placeholder": "Enter px value", "span": true},
-            {"title": "Border Width", "type": "number", "placeholder": "Enter px value"},
-            {"title": "Border Color", "type": "color"},
-            {"title": "Box Shadow Size", "type": "number", "placeholder": "Enter px value"},
-            {"title": "Box Shadow Color", "type": "color"},
-            {"title": "Font Size", "type": "number", "placeholder": "Enter px value"},
+            { "title": "Background Color", "type": "color" },
+            { "title": "Text Color", "type": "color" },
+            { "title": "Width", "type": "range", "min": 0, "max": 300, "span": true },
+            { "title": "Height", "type": "range", "min": 0, "max": 300, "span": true },
+            { "title": "Border Width", "type": "number", "placeholder": "Enter px value" },
+            { "title": "Border Color", "type": "color" },
+            { "title": "Box Shadow Size", "type": "number", "placeholder": "Enter px value" },
+            { "title": "Box Shadow Color", "type": "color" },
+            { "title": "Font Size", "type": "number", "placeholder": "Enter px value" },
         ],
         selectInputs: [
-            {"title": "Font Weigth", "options":[{"name": "Bold", "value": 900},{"name": "Semi-Bold", "value": 600},{"name": "Light", "value": 200}]},
+            { "title": "Font Weigth", "options": [{ "name": "Bold", "value": 900 }, { "name": "Semi-Bold", "value": 600 }, { "name": "Light", "value": 200 }] },
         ]
     }
 
@@ -66,6 +69,8 @@ main = ($) => {
         self.buildHTML();
         self.buildCSS();
         self.setEvents();
+        self.renderInputs();
+        self.renderSelectInputs();
         self.getInitialData();
 
         requestAnimationFrame(() => {
@@ -89,67 +94,7 @@ main = ($) => {
                 </div>
                 <div class=${classes.panel}>
                     <h2> Panel </h2>
-
-                    <label class=${classes.panelLabel} >
-                        Background Color:
-                        <input type=color class="${classes.panelInput}" ></input>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Text Color:
-                        <input type=color class="${classes.panelInput}" ></input>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Width:
-                        <div class=${classes.panelInputContainer}>
-                            <span></span>
-                            <input type=range min="50" max="300" class="${classes.panelInput}" placeholder="Enter px value"></input>
-                        </div>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Height:
-                        <div class=${classes.panelInputContainer}>
-                            <span></span>
-                            <input type=range min="50" max="300" class="${classes.panelInput}" placeholder="Enter px value"></input>
-                        </div>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Border Width:
-                        <input type=number class="${classes.panelInput}" placeholder="Enter px value"></input>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Border Color:
-                        <input type=color class="${classes.panelInput}"></input>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Box Shadow Size:
-                        <input type=number class="${classes.panelInput}" placeholder="Enter px value"></input>
-                    </label>
-
-                    <label class=${classes.panelLabel} >
-                        Box Shadow Color:
-                        <input type=color class="${classes.panelInput}"></input>
-                    </label>
-                    
-                    <label class=${classes.panelLabel} >
-                        Font Size:
-                        <input type=number class="${classes.panelInput}" placeholder="Enter px value"></input>
-                    </label>
-
-                    <label class=${classes.panelLabel}>
-                        Font Weight:
-                        <select class=${classes.panelInput}>
-                            <option value="Bold"> Bold </option>
-                            <option value="Semi-Bold"> Semi-Bold </option>
-                            <option value="Light"> Light </option>
-                        </select>
-                    </label>
-
+                    <div class=${classes.inputContainer}></div>
                     <button class=${classes.btn}>Save Settings</button>
                 </div>
             </div>
@@ -240,7 +185,7 @@ main = ($) => {
 
         ${selectors.panelInput}{
             font-size: 12px;
-            width: 5rem;
+            width: 10rem;
             height: 1.5rem;
             padding: 0.1rem 0.5rem;
             box-sizing: border-box;
@@ -295,9 +240,9 @@ main = ($) => {
         $(document).on("change.eventListener", selectors.panelInput, (e) => {
             const $target = $(e.target);
             const $box = $(selectors.box);
-            const text = $target.closest("label").contents().first().text().trim().slice(0, -1);
+            const text = $target.closest("label").contents().first().text().trim();
             const val = $target.val();
-
+            console.log(text)
             switch (text) {
                 case ("Background Color"):
                     self.boxProps.backgroundColor = val;
@@ -362,6 +307,59 @@ main = ($) => {
 
     //  ---------- UTILS --------------
 
+    self.renderInputs = () => {
+        self.inputs.forEach((i) => {
+            let $html;
+            if (!i.span) {
+                $html = $(`
+                <label class=${classes.panelLabel}>
+                    ${i.title}
+                    <input
+                        class=${classes.panelInput}
+                        ${i.type ? `type=${i.type}` : "type=text"}
+                        ${i.min ? `min=${i.min}` : ""}
+                        ${i.max ? `max=${i.max}` : ""}
+                        ${i.placeholder ? `placeholder="${i.placeholder}"` : ""}
+                    ></input>
+                </label>    
+                `)
+            } else {
+                $html = $(`
+                <label class=${classes.panelLabel}>
+                    ${i.title}
+                    <div class=${classes.panelInputContainer}>
+                        <span></span>
+                        <input
+                            class=${classes.panelInput}
+                            ${i.type ? `type=${i.type}` : "type=text"}
+                            ${i.min ? `min=${i.min}` : ""}
+                            ${i.max ? `max=${i.max}` : ""}
+                            ${i.placeholder ? `placeholder="${i.placeholder}"` : ""}
+                        ></input>
+                    </div>
+                </label>    
+                `)
+            }
+            $(selectors.panelTitle).after($html);
+        })
+    }
+
+    self.renderSelectInputs = () => {
+        self.selectInputs.forEach((i) => {
+            const $html = $(`
+                <label class=${classes.panelLabel}>
+                    ${i.title}
+                    <select class=${classes.panelInput}>
+                        ${i.options.map((o)=>{
+                            return `<option value=${o.value}> ${o.name} </option>`
+                        })}
+                    </select>
+                </label>    
+                `)
+            $(selectors.panelTitle).after($html);
+        })
+    }
+
     self.setBoxLocalStorage = () => {
         localStorage.setItem("boxProps", JSON.stringify(self.boxProps));
     }
@@ -375,7 +373,7 @@ main = ($) => {
         if (localBoxProps) {
             self.boxProps = localBoxProps;
             const $box = $(selectors.box);
-            const {backgroundColor, textColor, width, height, borderWidth, borderColor, boxShadowSize, boxShadowColor, fontSize, fontWeight} = self.boxProps;
+            const { backgroundColor, textColor, width, height, borderWidth, borderColor, boxShadowSize, boxShadowColor, fontSize, fontWeight } = self.boxProps;
             $box.css({
                 "background-color": `${backgroundColor}`,
                 "color": `${textColor}`,
@@ -393,7 +391,7 @@ main = ($) => {
     self.setInitialInputValues = () => {
         const $labels = $(selectors.panelLabel)
         $labels.each((i, label) => {
-            const text = $(label).closest("label").contents().first().text().trim().slice(0, -1);
+            const text = $(label).closest("label").contents().first().text().trim();
             const $input = $(label).find("input");
             const $span = $(label).find("span");
 
@@ -405,11 +403,11 @@ main = ($) => {
                     $input.val(self.boxProps.textColor);
                     break;
                 case ("Width"):
-                    $span.text(self.boxProps.width+"px");
+                    $span.text(self.boxProps.width + "px");
                     $input.val(self.boxProps.width);
                     break;
                 case ("Height"):
-                    $span.text(self.boxProps.height+"px");
+                    $span.text(self.boxProps.height + "px");
                     $input.val(self.boxProps.height);
                     break;
                 case ("Border Width"):
@@ -450,12 +448,12 @@ main = ($) => {
                 ${icons.success} ${msg}
             </div>    
         `)
-        
+
         $(selectors.body).append($html);
-        $html.animate({right: "100px"}, 500)
-        setTimeout(()=>{
+        $html.animate({ right: "100px" }, 500)
+        setTimeout(() => {
             $html.remove();
-        },1000)
+        }, 1000)
     }
 
 
