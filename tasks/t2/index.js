@@ -24,6 +24,8 @@ main = ($) => {
         toastContainer: "toast-container",
         iconSuccess: "icon-success",
         buttonContainer: "button-container",
+        mouseCircle: "mouse-circle",
+        mouseCircleFilled: "mouse-circle-filled",
     }
 
     const selectors = Object.keys(classes).reduce(
@@ -57,6 +59,7 @@ main = ($) => {
         ],
         boxes: [],
         selectedBoxes: [],
+        mouseDown: false,
     }
 
     const icons = {
@@ -71,6 +74,7 @@ main = ($) => {
         self.renderInitialBoxes();
         self.renderInputs();
         self.renderSelectInputs();
+        self.renderMouseCircle();
     }
 
     self.reset = () => {
@@ -250,6 +254,25 @@ main = ($) => {
             stroke: ${root["color-success"]};
         }
         
+        ${selectors.mouseCircle}{
+            position: fixed;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 1px solid ${root["color-1"]};
+            pointer-events: none;
+            left: 0;
+            top: 0;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px ${root["color-2"]};
+            transition: background-color 0.5s ease;
+        }
+
+        ${selectors.mouseCircleFilled}{
+            background-color: ${root["color-2"]};
+        }
+        
+
         </style>`;
 
         $(selectors.appendLocation).append(customStlye);
@@ -268,7 +291,7 @@ main = ($) => {
             let boxProps = {};
             boxProps[dataStyle] = val + dataStyleSuffix;
             const boxFound = self.selectedBoxes.find((box) => box.id === id)
-            boxFound.boxProps = {...boxFound.boxProps,...boxProps};
+            boxFound.boxProps = { ...boxFound.boxProps, ...boxProps };
 
             if (dataStyle === "box-shadow-size" || dataStyle === "box-shadow-color") {
                 const size = boxProps["box-shadow-size"] || "0px";
@@ -286,6 +309,7 @@ main = ($) => {
 
         $(document).on("click.eventListener", selectors.buttonSave, (e) => {
             e.preventDefault();
+            console.log(self.boxes)
             self.setLocalStorage("boxes", self.boxes);
             self.showToast("Settings Saved ...");
         });
@@ -295,24 +319,41 @@ main = ($) => {
         });
 
         $(document).on("click.eventListener", selectors.buttonDelete, (e) => {
-            const id = $(e.currentTarget).data["id"];
-            self.deleteBox(id);
+            self.deleteBox();
         });
 
         $(document).on("click.eventListener", selectors.box, (e) => {
             const $target = $(e.currentTarget);
             $target.toggleClass(classes.selectedBox)
             const id = $target.data("id")
-            const foundBox = self.boxes.find((box)=> box.id === id);
+            const foundBox = self.boxes.find((box) => box.id === id);
             const foundBoxInSelected = self.selectedBoxes.find((box) => box.id === id);
-            
-            if(foundBoxInSelected){
-                self.selectedBoxes = self.selectedBoxes.filter((box)=> box.id !==id);
-            }else{
+
+            if (foundBoxInSelected) {
+                self.selectedBoxes = self.selectedBoxes.filter((box) => box.id !== id);
+            } else {
                 self.selectedBoxes.push(foundBox);
                 self.setSelectedInputValues();
             }
         })
+
+        $(document).on("mousemove.eventListener", selectors.body, self.debounce((e)=>{
+            const {clientX, clientY} = e;
+            $(selectors.mouseCircle).css({
+                left: `${clientX}px`,
+                top: `${clientY}px`
+            })
+        }, 0.1))
+
+        $(document).on("mousedown.eventListener", selectors.body, self.debounce((e) => {
+            self.mouseDown = true;
+            self.fillMouseCircle();
+        }, 3))
+
+        $(document).on("mouseup.eventListener", selectors.body, self.debounce((e) => {
+            self.mouseDown = false;
+            self.fillMouseCircle();
+        }, 3))
 
     }
 
@@ -326,6 +367,14 @@ main = ($) => {
         return JSON.parse(localStorage.getItem(key));
     }
 
+    self.debounce = (fn, delay = 50) => {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), delay);
+        }
+    }
+
     self.renderInitialBoxes = () => {
         const localBoxes = self.getLocalStorage("boxes");
         if (localBoxes) {
@@ -333,11 +382,11 @@ main = ($) => {
             self.boxes.forEach((box) => {
                 const $html = $(box.html);
                 $html.data["id"] = box.id;
-                if(box.boxProps){
-                    if(box.boxProps["box-shadow-color"] || box.boxProps["box-shadow-size"]){
+                if (box.boxProps) {
+                    if (box.boxProps["box-shadow-color"] || box.boxProps["box-shadow-size"]) {
                         const size = box.boxProps["box-shadow-size"] || "0";
                         const color = box.boxProps["box-shadow-color"] || "";
-                        $html.css({"box-shadow": `0 0 ${size} ${color}`});
+                        $html.css({ "box-shadow": `0 0 ${size} ${color}` });
                     }
 
                     $html.css(box.boxProps)
@@ -405,9 +454,7 @@ main = ($) => {
     }
 
     self.setSelectedInputValues = () => {
-        if(self.selectedBoxes.length === 0) return;
-
-        console.log(self.selectedBoxes)
+        if (self.selectedBoxes.length === 0) return;
 
         const selectedBox = self.selectedBoxes[0];
         const props = selectedBox.boxProps || {};
@@ -419,13 +466,13 @@ main = ($) => {
             const $select = $label.find("select");
             const $span = $label.find("span");
 
-            if($input.length){
+            if ($input.length) {
                 const dataStyle = $input.data("style");
                 const val = props[dataStyle];
                 $input.val(val);
-                $input.attr("placeholder",val);
-                if($span.length) $span.text(val);
-                if($input.attr("type") === "range" && val) $input.val(parseInt(val));
+                $input.attr("placeholder", val);
+                if ($span.length) $span.text(val);
+                if ($input.attr("type") === "range" && val) $input.val(parseInt(val));
             }
 
             if ($select.length) {
@@ -452,8 +499,8 @@ main = ($) => {
 
     self.addBox = () => {
         let maxId = 0;
-        self.boxes.forEach((box)=>{
-            if(box.id > maxId){
+        self.boxes.forEach((box) => {
+            if (box.id > maxId) {
                 maxId = box.id;
             }
         });
@@ -470,18 +517,29 @@ main = ($) => {
         self.boxes.push(box);
     }
 
-    self.deleteBox = (id) => {
+    self.deleteBox = () => {
+        const idsToDelete = self.selectedBoxes.map((box)=> box.id);
         const $boxes = $(selectors.box)
-        $boxes.each((index,box)=>{
+
+        $boxes.each((index, box) => {
             const $box = $(box);
-            if($box.data("id") === id) $box.remove();
+            const boxId = $box.data("id");
+            if (idsToDelete.includes(boxId)) $box.remove();
         })
-        self.boxes = self.boxes.filter((box) => box.id !== id);
+
+        self.boxes = self.boxes.filter((box) => !idsToDelete.includes(box.id));
+        self.selectedBoxes = [];
     }
 
-    
+    self.renderMouseCircle = () => {
+        const $html = $(`<div class=${classes.mouseCircle}></div>`)
+        $(selectors.body).append($html);
+    }
 
-
+    self.fillMouseCircle = () => {
+            const $mouseCircle = $(selectors.mouseCircle);
+            $mouseCircle.toggleClass(classes.mouseCircleFilled);
+    }
 
 
     $(document).ready(self.init);
