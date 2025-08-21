@@ -14,6 +14,7 @@ main = ($) => {
         container: "container",
         boxContainer: "box-container",
         box: "box",
+        selectedBox: "selected-box",
         panel: "panel",
         inputContainer: "input-container",
         panelLabel: "panel-label",
@@ -33,6 +34,8 @@ main = ($) => {
         appendLocation: `#appendLocation`,
         body: `body`,
         buttonSave: `[data-btn = save]`,
+        buttonAdd: `[data-btn = add]`,
+        buttonDelete: `[data-btn = delete]`,
     }
 
     );
@@ -52,7 +55,9 @@ main = ($) => {
         ],
         selectInputs: [
             { "title": "Font Weigth", "options": [{ "name": "Bold", "value": 900 }, { "name": "Semi-Bold", "value": 600 }, { "name": "Light", "value": 200 }], "data-style": "font-weight" },
-        ]
+        ],
+        boxes: [],
+        selectedBoxes: [],
     }
 
     const icons = {
@@ -64,10 +69,9 @@ main = ($) => {
         self.buildHTML();
         self.buildCSS();
         self.setEvents();
+        self.renderInitialBoxes();
         self.renderInputs();
         self.renderSelectInputs();
-        self.setInitialBoxProps();
-        requestAnimationFrame(self.setInitialInputValues);
     }
 
     self.reset = () => {
@@ -81,13 +85,13 @@ main = ($) => {
             `
             <div class=${classes.container}>
                 <div class=${classes.boxContainer}>
-                    <div class=${classes.box}> BOX </div>
+                    
                 </div>
                 <div class=${classes.panel}>
                     <h2> Panel </h2>
                     <div class=${classes.buttonContainer}>
-                        <button class=${classes.btn}>Add Box</button>
-                        <button class=${classes.btn}>Delete Box</button>
+                        <button class=${classes.btn} data-btn="add">Add Box</button>
+                        <button class=${classes.btn} data-btn="delete">Delete Box</button>
                     </div>
                     <div class=${classes.inputContainer}></div>
                     <button class=${classes.btn} data-btn="save">Save Settings</button>
@@ -136,7 +140,10 @@ main = ($) => {
             padding: 1rem;
             border: 1px solid ${root["color-4"]};
             border-radius: ${root["rounded-md"]};
-            overflow: hidden;
+            overflow: auto;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         ${selectors.box}{
@@ -150,6 +157,10 @@ main = ($) => {
             border-radius: ${root["rounded-md"]};
             transition: all 0.3s ease;
             font-weight: 200;
+        }
+
+        ${selectors.selectedBox}{
+            transform: rotate(45deg);
         }
 
         ${selectors.panel}{
@@ -247,34 +258,92 @@ main = ($) => {
     self.setEvents = () => {
         $(document).on("change.eventListener", selectors.panelInput, (e) => {
             const $target = $(e.target);
-            const $box = $(selectors.box);
+            const $selectedBox = $(selectors.selectedBox);
             const val = $target.val();
             const dataStyle = $target.data("style");
             const dataStyleSuffix = $target.data("styleSuffix") || "";
+            const id = $selectedBox.data("id");
 
             self.boxProps[dataStyle] = val + dataStyleSuffix;
+            const boxFound = self.selectedBoxes.find((box) => box.id === id)
+            boxFound.boxProps = self.boxProps;
 
             if (dataStyle === "box-shadow-size" || dataStyle === "box-shadow-color") {
                 const size = self.boxProps["box-shadow-size"] || "0px";
                 const color = self.boxProps["box-shadow-color"] || "";
-                $box.css({ "box-shadow": `0 0 ${size} ${color}` });
+                $selectedBox.css({ "box-shadow": `0 0 ${size} ${color}` });
             } else {
-                $box.css({ [dataStyle]: self.boxProps[dataStyle] });
+                $selectedBox.css({ [dataStyle]: self.boxProps[dataStyle] });
             }
 
             if ($target.closest("label").find("span").length) {
                 $target.prev("span").text(self.boxProps[dataStyle])
             }
+            self.setSelectedInputValues();
         });
 
         $(document).on("click.eventListener", selectors.buttonSave, (e) => {
             e.preventDefault();
-            self.setBoxLocalStorage();
+            self.setLocalStorage("boxes", self.boxes);
             self.showToast("Settings Saved ...");
         });
+
+        $(document).on("click.eventListener", selectors.buttonAdd, (e) => {
+            self.addBox();
+        });
+
+        $(document).on("click.eventListener", selectors.buttonDelete, (e) => {
+            const id = $(e.currentTarget).data["id"];
+            self.deleteBox(id);
+        });
+
+        $(document).on("click.eventListener", selectors.box, (e) => {
+            const $target = $(e.currentTarget);
+            $target.toggleClass(classes.selectedBox)
+            const id = $target.data("id")
+            const foundBox = self.boxes.find((box)=> box.id === id);
+            const foundBoxInSelected = self.selectedBoxes.find((box) => box.id === id);
+            
+            if(foundBoxInSelected){
+                self.selectedBoxes = self.selectedBoxes.filter((box)=> box.id !==id);
+            }else{
+                self.selectedBoxes.push(foundBox);
+                self.setSelectedInputValues();
+            }
+        })
+
     }
 
     //  ---------- UTILS --------------
+
+    self.setLocalStorage = (key, value) => {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    self.getLocalStorage = (key) => {
+        return JSON.parse(localStorage.getItem(key));
+    }
+
+    self.renderInitialBoxes = () => {
+        const localBoxes = self.getLocalStorage("boxes");
+        if (localBoxes) {
+            self.boxes = localBoxes;
+            self.boxes.forEach((box) => {
+                const $html = $(box.html);
+                $html.data["id"] = box.id;
+                if(box.boxProps){
+                    if(box.boxProps["box-shadow-color"] || box.boxProps["box-shadow-size"]){
+                        const size = box.boxProps["box-shadow-size"] || "0";
+                        const color = box.boxProps["box-shadow-color"] || "";
+                        $html.css({"box-shadow": `0 0 ${size} ${color}`});
+                    }
+
+                    $html.css(box.boxProps)
+                }
+                $(selectors.boxContainer).append($html);
+            })
+        }
+    }
 
     self.renderInputs = () => {
         self.inputs.forEach((input) => {
@@ -333,61 +402,27 @@ main = ($) => {
         })
     }
 
-    self.setBoxLocalStorage = () => {
-        localStorage.setItem("boxProps", JSON.stringify(self.boxProps));
-    }
-
-    self.getBoxLocalStorage = () => {
-        return JSON.parse(localStorage.getItem("boxProps"));
-    }
-
-    self.setInitialBoxProps = () => {
-        const localBoxProps = self.getBoxLocalStorage();
-        if (localBoxProps) {
-            self.boxProps = localBoxProps;
-            const $box = $(selectors.box);
-
-            self.inputs.forEach((input) => {
-                const style = input["data-style"];
-                const value = self.boxProps[style];
-                if (style === "box-shadow-size" || style === "box-shadow-color") {
-                    const size = self.boxProps["box-shadow-size"] || "0px";
-                    const color = self.boxProps["box-shadow-color"] || "";
-                    $box.css({ "box-shadow": `0 0 ${size} ${color}` });
-                } else {
-                    $box.css({ [style]: value, });
-                }
-            })
-
-            self.selectInputs.forEach((input) => {
-                const style = input["data-style"];
-                const value = self.boxProps[style];
-                $box.css({ [style]: value });
-            })
-        }
-    }
-
-    self.setInitialInputValues = () => {
+    self.setSelectedInputValues = () => {
         const $labels = $(selectors.panelLabel);
         $labels.each((index, label) => {
             const $input = $(label).find("input");
             const $select = $(label).find("select");
             const dataStyle = $input.data("style");
-            const val = self.boxProps[dataStyle];
+            const val = self.selectedBoxes[0].boxProps[dataStyle];
             const $span = $(label).find("span");
 
             $input.val(val);
             $input.attr("placeholder", val);
             $span.text(val);
 
-            if($select){
+            if ($select) {
                 const $select = $(label).find("select");
                 const dataStyle = $select.data("style");
                 const val = self.boxProps[dataStyle];
                 $select.val(val);
             }
 
-            if($input.attr("type") === "range"){
+            if ($input.attr("type") === "range") {
                 $input.val(parseInt(val));
             }
         })
@@ -406,6 +441,40 @@ main = ($) => {
             $html.fadeOut(500);
         }, 1000)
     }
+
+    self.addBox = () => {
+        let maxId = 0;
+        self.boxes.forEach((box)=>{
+            if(box.id > maxId){
+                maxId = box.id;
+            }
+        });
+        let id = maxId + 1;
+
+        const html = `<div class=${classes.box} data-id=${id}> BOX </div>`;
+        $(selectors.boxContainer).append(html);
+
+        const box = {
+            id: id,
+            html: html,
+            boxProps: {},
+        }
+        self.boxes.push(box);
+
+
+    }
+
+    self.deleteBox = (id) => {
+        const $boxes = $(selectors.box)
+        $boxes.each((index,box)=>{
+            const $box = $(box);
+            if($box.data("id") === id) $box.remove();
+        })
+        self.boxes = self.boxes.filter((box) => box.id !== id);
+    }
+
+    
+
 
 
 
