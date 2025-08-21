@@ -41,7 +41,6 @@ main = ($) => {
     );
 
     const self = {
-        boxProps: {},
         inputs: [
             { "title": "Background Color", "type": "color", "data-style": "background-color" },
             { "title": "Text Color", "type": "color", "data-style": "color" },
@@ -157,6 +156,7 @@ main = ($) => {
             border-radius: ${root["rounded-md"]};
             transition: all 0.3s ease;
             font-weight: 200;
+            cursor: pointer;
         }
 
         ${selectors.selectedBox}{
@@ -259,25 +259,27 @@ main = ($) => {
         $(document).on("change.eventListener", selectors.panelInput, (e) => {
             const $target = $(e.target);
             const $selectedBox = $(selectors.selectedBox);
+            const $span = $target.prev("span");
             const val = $target.val();
             const dataStyle = $target.data("style");
             const dataStyleSuffix = $target.data("styleSuffix") || "";
             const id = $selectedBox.data("id");
 
-            self.boxProps[dataStyle] = val + dataStyleSuffix;
+            let boxProps = {};
+            boxProps[dataStyle] = val + dataStyleSuffix;
             const boxFound = self.selectedBoxes.find((box) => box.id === id)
-            boxFound.boxProps = self.boxProps;
+            boxFound.boxProps = {...boxFound.boxProps,...boxProps};
 
             if (dataStyle === "box-shadow-size" || dataStyle === "box-shadow-color") {
-                const size = self.boxProps["box-shadow-size"] || "0px";
-                const color = self.boxProps["box-shadow-color"] || "";
+                const size = boxProps["box-shadow-size"] || "0px";
+                const color = boxProps["box-shadow-color"] || "";
                 $selectedBox.css({ "box-shadow": `0 0 ${size} ${color}` });
             } else {
-                $selectedBox.css({ [dataStyle]: self.boxProps[dataStyle] });
+                $selectedBox.css({ [dataStyle]: boxProps[dataStyle] });
             }
 
-            if ($target.closest("label").find("span").length) {
-                $target.prev("span").text(self.boxProps[dataStyle])
+            if ($span) {
+                $span.text(boxProps[dataStyle])
             }
             self.setSelectedInputValues();
         });
@@ -403,27 +405,33 @@ main = ($) => {
     }
 
     self.setSelectedInputValues = () => {
+        if(self.selectedBoxes.length === 0) return;
+
+        console.log(self.selectedBoxes)
+
+        const selectedBox = self.selectedBoxes[0];
+        const props = selectedBox.boxProps || {};
         const $labels = $(selectors.panelLabel);
+
         $labels.each((index, label) => {
-            const $input = $(label).find("input");
-            const $select = $(label).find("select");
-            const dataStyle = $input.data("style");
-            const val = self.selectedBoxes[0].boxProps[dataStyle];
-            const $span = $(label).find("span");
+            const $label = $(label);
+            const $input = $label.find("input");
+            const $select = $label.find("select");
+            const $span = $label.find("span");
 
-            $input.val(val);
-            $input.attr("placeholder", val);
-            $span.text(val);
-
-            if ($select) {
-                const $select = $(label).find("select");
-                const dataStyle = $select.data("style");
-                const val = self.boxProps[dataStyle];
-                $select.val(val);
+            if($input.length){
+                const dataStyle = $input.data("style");
+                const val = props[dataStyle];
+                $input.val(val);
+                $input.attr("placeholder",val);
+                if($span.length) $span.text(val);
+                if($input.attr("type") === "range" && val) $input.val(parseInt(val));
             }
 
-            if ($input.attr("type") === "range") {
-                $input.val(parseInt(val));
+            if ($select.length) {
+                const dataStyle = $select.data("style");
+                const val = props[dataStyle];
+                $select.val(val);
             }
         })
     }
@@ -460,8 +468,6 @@ main = ($) => {
             boxProps: {},
         }
         self.boxes.push(box);
-
-
     }
 
     self.deleteBox = (id) => {
