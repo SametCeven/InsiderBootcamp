@@ -22,41 +22,36 @@ main = ($) => {
         btn: "btn",
         toastContainer: "toast-container",
         iconSuccess: "icon-success",
+        buttonContainer: "button-container",
     }
 
-    const selectors = {
+    const selectors = Object.keys(classes).reduce(
+        (acc, key) => {
+            acc[key] = `.${classes[key]}`;
+            return acc;
+        }, {
         appendLocation: `#appendLocation`,
-        style: `.${classes.style}`,
-        container: `.${classes.container}`,
-        boxContainer: `.${classes.boxContainer}`,
         body: `body`,
-        box: `.${classes.box}`,
-        panel: `.${classes.panel}`,
-        inputContainer: `.${classes.inputContainer}`,
-        panelLabel: `.${classes.panelLabel}`,
-        panelInput: `.${classes.panelInput}`,
-        panelInputContainer: `.${classes.panelInputContainer}`,
-        btn: `.${classes.btn}`,
-        toastContainer: `.${classes.toastContainer}`,
-        iconSuccess: `.${classes.iconSuccess}`,
-        panelTitle: `.${classes.panel} h2`,
+        buttonSave: `[data-btn = save]`,
     }
+
+    );
 
     const self = {
         boxProps: {},
         inputs: [
-            { "title": "Background Color", "type": "color" },
-            { "title": "Text Color", "type": "color" },
-            { "title": "Width", "type": "range", "min": 0, "max": 300, "span": true },
-            { "title": "Height", "type": "range", "min": 0, "max": 300, "span": true },
-            { "title": "Border Width", "type": "number", "placeholder": "Enter px value" },
-            { "title": "Border Color", "type": "color" },
-            { "title": "Box Shadow Size", "type": "number", "placeholder": "Enter px value" },
-            { "title": "Box Shadow Color", "type": "color" },
-            { "title": "Font Size", "type": "number", "placeholder": "Enter px value" },
+            { "title": "Background Color", "type": "color", "data-style": "background-color" },
+            { "title": "Text Color", "type": "color", "data-style": "color" },
+            { "title": "Width", "type": "range", "min": 0, "max": 300, "span": true, "data-style": "width", "data-styleSuffix": "px" },
+            { "title": "Height", "type": "range", "min": 0, "max": 300, "span": true, "data-style": "height", "data-styleSuffix": "px" },
+            { "title": "Border Width", "type": "number", "placeholder": "Enter px value", "data-style": "border-width", "data-styleSuffix": "px" },
+            { "title": "Border Color", "type": "color", "data-style": "border-color" },
+            { "title": "Box Shadow Size", "type": "number", "placeholder": "Enter px value", "data-style": "box-shadow-size", "data-styleSuffix": "px" },
+            { "title": "Box Shadow Color", "type": "color", "data-style": "box-shadow-color" },
+            { "title": "Font Size", "type": "number", "placeholder": "Enter px value", "data-style": "font-size", "data-styleSuffix": "px" },
         ],
         selectInputs: [
-            { "title": "Font Weigth", "options": [{ "name": "Bold", "value": 900 }, { "name": "Semi-Bold", "value": 600 }, { "name": "Light", "value": 200 }] },
+            { "title": "Font Weigth", "options": [{ "name": "Bold", "value": 900 }, { "name": "Semi-Bold", "value": 600 }, { "name": "Light", "value": 200 }], "data-style": "font-weight" },
         ]
     }
 
@@ -71,12 +66,8 @@ main = ($) => {
         self.setEvents();
         self.renderInputs();
         self.renderSelectInputs();
-        self.getInitialData();
-
-        requestAnimationFrame(() => {
-            self.setInitialInputValues();
-        })
-
+        self.setInitialBoxProps();
+        requestAnimationFrame(self.setInitialInputValues);
     }
 
     self.reset = () => {
@@ -94,8 +85,12 @@ main = ($) => {
                 </div>
                 <div class=${classes.panel}>
                     <h2> Panel </h2>
+                    <div class=${classes.buttonContainer}>
+                        <button class=${classes.btn}>Add Box</button>
+                        <button class=${classes.btn}>Delete Box</button>
+                    </div>
                     <div class=${classes.inputContainer}></div>
-                    <button class=${classes.btn}>Save Settings</button>
+                    <button class=${classes.btn} data-btn="save">Save Settings</button>
                 </div>
             </div>
         `
@@ -167,6 +162,18 @@ main = ($) => {
             gap: 2rem;
             border-radius: ${root["rounded-md"]};
         }
+
+        ${selectors.buttonContainer}{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        ${selectors.inputContainer}{
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
         
         ${selectors.panelLabel}{
             font-size: 12px;
@@ -199,6 +206,7 @@ main = ($) => {
             border: none;
             transition: all 0.3s ease;
             cursor: pointer;
+            min-width: 5rem;
         }
 
         ${selectors.btn}:hover{
@@ -240,65 +248,26 @@ main = ($) => {
         $(document).on("change.eventListener", selectors.panelInput, (e) => {
             const $target = $(e.target);
             const $box = $(selectors.box);
-            const text = $target.closest("label").contents().first().text().trim();
             const val = $target.val();
-            console.log(text)
-            switch (text) {
-                case ("Background Color"):
-                    self.boxProps.backgroundColor = val;
-                    $box.css({ "background-color": `${val}` });
-                    break;
-                case ("Text Color"):
-                    self.boxProps.textColor = val;
-                    $box.css({ "color": `${val}` });
-                    break;
-                case ("Width"):
-                    self.boxProps.width = val;
-                    $box.width(val);
-                    $target.prev("span").text(val + "px");
-                    break;
-                case ("Height"):
-                    self.boxProps.height = val;
-                    $box.height(val);
-                    $target.prev("span").text(val + "px");
-                    break;
-                case ("Border Width"):
-                    self.boxProps.borderWidth = val;
-                    $box.css({ "border-width": `${val}` });
-                    break;
-                case ("Border Color"):
-                    self.boxProps.borderColor = val;
-                    $box.css({ "border-color": `${val}` });
-                    break;
-                case ("Box Shadow Size"):
-                    self.boxProps.boxShadowSize = val;
-                    break;
-                case ("Box Shadow Color"):
-                    self.boxProps.boxShadowColor = val;
-                    break;
-                case ("Font Size"):
-                    const fontSize = parseInt(val);
-                    self.boxProps.fontSize = fontSize;
-                    $box.css({ "font-size": `${fontSize}px` });
-                    break;
-                case ("Font Weight"):
-                    let valWeight;
-                    if (val === "Bold") valWeight = 900;
-                    if (val === "Semi-Bold") valWeight = 600;
-                    if (val === "Light") valWeight = 200;
-                    self.boxProps.fontWeight = valWeight;
-                    $box.css({ "font-weight": `${valWeight}` });
-                    break;
-                default:
-                    break;
+            const dataStyle = $target.data("style");
+            const dataStyleSuffix = $target.data("styleSuffix") || "";
+
+            self.boxProps[dataStyle] = val + dataStyleSuffix;
+
+            if (dataStyle === "box-shadow-size" || dataStyle === "box-shadow-color") {
+                const size = self.boxProps["box-shadow-size"] || "0px";
+                const color = self.boxProps["box-shadow-color"] || "";
+                $box.css({ "box-shadow": `0 0 ${size} ${color}` });
+            } else {
+                $box.css({ [dataStyle]: self.boxProps[dataStyle] });
             }
 
-            if (self.boxProps.boxShadowColor && self.boxProps.boxShadowSize) {
-                $box.css({ "box-shadow": `0 0 ${self.boxProps.boxShadowSize}px ${self.boxProps.boxShadowColor}` });
+            if ($target.closest("label").find("span").length) {
+                $target.prev("span").text(self.boxProps[dataStyle])
             }
         });
 
-        $(document).on("click.eventListener", selectors.btn, (e) => {
+        $(document).on("click.eventListener", selectors.buttonSave, (e) => {
             e.preventDefault();
             self.setBoxLocalStorage();
             self.showToast("Settings Saved ...");
@@ -308,55 +277,59 @@ main = ($) => {
     //  ---------- UTILS --------------
 
     self.renderInputs = () => {
-        self.inputs.forEach((i) => {
+        self.inputs.forEach((input) => {
             let $html;
-            if (!i.span) {
+            if (!input.span) {
                 $html = $(`
                 <label class=${classes.panelLabel}>
-                    ${i.title}
+                    ${input.title}
                     <input
                         class=${classes.panelInput}
-                        ${i.type ? `type=${i.type}` : "type=text"}
-                        ${i.min ? `min=${i.min}` : ""}
-                        ${i.max ? `max=${i.max}` : ""}
-                        ${i.placeholder ? `placeholder="${i.placeholder}"` : ""}
+                        ${input.type ? `type=${input.type}` : "type=text"}
+                        ${input.min ? `min=${input.min}` : ""}
+                        ${input.max ? `max=${input.max}` : ""}
+                        ${input.placeholder ? `placeholder="${input.placeholder}"` : ""}
                     ></input>
                 </label>    
                 `)
             } else {
                 $html = $(`
                 <label class=${classes.panelLabel}>
-                    ${i.title}
+                    ${input.title}
                     <div class=${classes.panelInputContainer}>
                         <span></span>
                         <input
                             class=${classes.panelInput}
-                            ${i.type ? `type=${i.type}` : "type=text"}
-                            ${i.min ? `min=${i.min}` : ""}
-                            ${i.max ? `max=${i.max}` : ""}
-                            ${i.placeholder ? `placeholder="${i.placeholder}"` : ""}
+                            ${input.type ? `type=${input.type}` : "type=text"}
+                            ${input.min ? `min=${input.min}` : ""}
+                            ${input.max ? `max=${input.max}` : ""}
+                            ${input.placeholder ? `placeholder="${input.placeholder}"` : ""}
                         ></input>
                     </div>
                 </label>    
                 `)
             }
-            $(selectors.panelTitle).after($html);
+            $html.find("input").data("style", input["data-style"]);
+            $html.find("input").data("styleSuffix", input["data-styleSuffix"]);
+            $(selectors.inputContainer).append($html);
         })
     }
 
     self.renderSelectInputs = () => {
-        self.selectInputs.forEach((i) => {
+        self.selectInputs.forEach((input) => {
             const $html = $(`
                 <label class=${classes.panelLabel}>
-                    ${i.title}
+                    ${input.title}
                     <select class=${classes.panelInput}>
-                        ${i.options.map((o)=>{
-                            return `<option value=${o.value}> ${o.name} </option>`
-                        })}
+                        ${input.options.map((o) => {
+                return `<option value=${o.value}> ${o.name} </option>`
+            })}
                     </select>
                 </label>    
                 `)
-            $(selectors.panelTitle).after($html);
+            $html.find("select").data("style", input["data-style"]);
+            $html.find("select").data("styleSuffix", input["data-styleSuffix"]);
+            $(selectors.inputContainer).append($html);
         })
     }
 
@@ -368,76 +341,54 @@ main = ($) => {
         return JSON.parse(localStorage.getItem("boxProps"));
     }
 
-    self.getInitialData = () => {
+    self.setInitialBoxProps = () => {
         const localBoxProps = self.getBoxLocalStorage();
         if (localBoxProps) {
             self.boxProps = localBoxProps;
             const $box = $(selectors.box);
-            const { backgroundColor, textColor, width, height, borderWidth, borderColor, boxShadowSize, boxShadowColor, fontSize, fontWeight } = self.boxProps;
-            $box.css({
-                "background-color": `${backgroundColor}`,
-                "color": `${textColor}`,
-                "width": `${width}`,
-                "height": `${height}`,
-                "border-width": `${borderWidth}`,
-                "border-color": `${borderColor}`,
-                "box-shadow": `0 0 ${boxShadowSize}px ${boxShadowColor}`,
-                "font-size": `${fontSize}px`,
-                "font-weight": `${fontWeight}`,
+
+            self.inputs.forEach((input) => {
+                const style = input["data-style"];
+                const value = self.boxProps[style];
+                if (style === "box-shadow-size" || style === "box-shadow-color") {
+                    const size = self.boxProps["box-shadow-size"] || "0px";
+                    const color = self.boxProps["box-shadow-color"] || "";
+                    $box.css({ "box-shadow": `0 0 ${size} ${color}` });
+                } else {
+                    $box.css({ [style]: value, });
+                }
+            })
+
+            self.selectInputs.forEach((input) => {
+                const style = input["data-style"];
+                const value = self.boxProps[style];
+                $box.css({ [style]: value });
             })
         }
     }
 
     self.setInitialInputValues = () => {
-        const $labels = $(selectors.panelLabel)
-        $labels.each((i, label) => {
-            const text = $(label).closest("label").contents().first().text().trim();
+        const $labels = $(selectors.panelLabel);
+        $labels.each((index, label) => {
             const $input = $(label).find("input");
+            const $select = $(label).find("select");
+            const dataStyle = $input.data("style");
+            const val = self.boxProps[dataStyle];
             const $span = $(label).find("span");
 
-            switch (text) {
-                case ("Background Color"):
-                    $input.val(self.boxProps.backgroundColor);
-                    break;
-                case ("Text Color"):
-                    $input.val(self.boxProps.textColor);
-                    break;
-                case ("Width"):
-                    $span.text(self.boxProps.width + "px");
-                    $input.val(self.boxProps.width);
-                    break;
-                case ("Height"):
-                    $span.text(self.boxProps.height + "px");
-                    $input.val(self.boxProps.height);
-                    break;
-                case ("Border Width"):
-                    $(label).find("input").val(self.boxProps.borderWidth);
-                    $input.attr("placeholder", self.boxProps.borderWidth);
-                    break;
-                case ("Border Color"):
-                    $input.val(self.boxProps.borderColor);
-                    break;
-                case ("Font Size"):
-                    $input.val(self.boxProps.fontSize);
-                    $input.attr("placeholder", self.boxProps.fontSize);
-                    break;
-                case ("Font Weight"):
-                    const $select = $(label).find("select");
-                    let fontWeightText;
-                    if (self.boxProps.fontWeight === 900) fontWeightText = "Bold";
-                    else if (self.boxProps.fontWeight === 600) fontWeightText = "Semi-Bold";
-                    else if (self.boxProps.fontWeight === 200) fontWeightText = "Light";
-                    $select.val(fontWeightText);
-                    break;
-                case ("Box Shadow Size"):
-                    $input.val(self.boxProps.boxShadowSize);
-                    $input.attr("placeholder", self.boxProps.boxShadowSize);
-                    break;
-                case ("Box Shadow Color"):
-                    $input.val(self.boxProps.boxShadowColor);
-                    break;
-                default:
-                    break;
+            $input.val(val);
+            $input.attr("placeholder", val);
+            $span.text(val);
+
+            if($select){
+                const $select = $(label).find("select");
+                const dataStyle = $select.data("style");
+                const val = self.boxProps[dataStyle];
+                $select.val(val);
+            }
+
+            if($input.attr("type") === "range"){
+                $input.val(parseInt(val));
             }
         })
     }
@@ -452,7 +403,7 @@ main = ($) => {
         $(selectors.body).append($html);
         $html.animate({ right: "100px" }, 500)
         setTimeout(() => {
-            $html.remove();
+            $html.fadeOut(500);
         }, 1000)
     }
 
