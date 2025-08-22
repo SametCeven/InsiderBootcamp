@@ -148,6 +148,7 @@ main = ($) => {
             gap: 1rem;
             flex-wrap: wrap;
             margin: 1rem;
+            position: relative;
         }
 
         ${selectors.box}{
@@ -162,6 +163,8 @@ main = ($) => {
             font-weight: 200;
             cursor: pointer;
             position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         ${selectors.iconSelecBox}{
@@ -389,19 +392,23 @@ main = ($) => {
         })
 
         $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
-            const { clientX, clientY, pageX, pageY } = e;
+            const { clientX, clientY, offsetX, offsetY, pageX, pageY } = e;
 
             $(selectors.mouseCircle).css({
                 left: `${clientX}px`,
                 top: `${clientY}px`
             })
 
-            if (!self.draggingBox) return;
-            if (!self.selectedBoxes.length) return;
+            if (!self.draggingBox || !self.selectedBoxes.length) return;
+
+            const $boxContainer = $(selectors.boxContainer);
+            const boxContainerOffset = $boxContainer.offset();
+            const left = pageX - boxContainerOffset.left;
+            const top = pageY - boxContainerOffset.top;
 
             self.draggingBox.css({
-                top: pageY + "px",
-                left: pageX + "px",
+                top: top + "px",
+                left: left + "px",
                 transform: "translate(-50%,-50%)",
             })
         }, 0))
@@ -429,6 +436,10 @@ main = ($) => {
             const { target } = e;
             self.draggingBox = $(target);
         }, 0))
+
+        $(window).on("resize", selectors.body, () => {
+            self.renderInitialBoxes();
+        })
 
     }
 
