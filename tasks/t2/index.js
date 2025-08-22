@@ -159,7 +159,6 @@ main = ($) => {
             align-items: center;
             border: 1px solid ${root["color-2"]};
             border-radius: ${root["rounded-md"]};
-            transition: all 0.1s ease;
             font-weight: 200;
             cursor: pointer;
             position: absolute;
@@ -390,7 +389,7 @@ main = ($) => {
         })
 
         $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
-            const { clientX, clientY, offsetX, offsetY, pageX, pageY } = e;
+            const { clientX, clientY, pageX, pageY } = e;
 
             $(selectors.mouseCircle).css({
                 left: `${clientX}px`,
