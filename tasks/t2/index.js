@@ -60,6 +60,8 @@ main = ($) => {
         boxes: [],
         selectedBoxes: [],
         mouseDown: false,
+        draggingBox: null,
+        dragOffset: { x: 0, y: 0 },
     }
 
     const icons = {
@@ -145,6 +147,7 @@ main = ($) => {
             gap: 1rem;
             flex-wrap: wrap;
             margin: 1rem;
+            position: relative;
         }
 
         ${selectors.box}{
@@ -156,9 +159,10 @@ main = ($) => {
             align-items: center;
             border: 1px solid ${root["color-2"]};
             border-radius: ${root["rounded-md"]};
-            transition: all 0.3s ease;
+            transition: all 0.1s ease;
             font-weight: 200;
             cursor: pointer;
+            position: absolute;
         }
 
         ${selectors.selectedBox}{
@@ -357,7 +361,6 @@ main = ($) => {
 
         $(document).on("click.eventListener", selectors.buttonSave, (e) => {
             e.preventDefault();
-            console.log(self.boxes)
             self.setLocalStorage("boxes", self.boxes);
             self.showToast("Settings Saved ...");
         });
@@ -372,7 +375,7 @@ main = ($) => {
 
         $(document).on("click.eventListener", selectors.box, (e) => {
             const $target = $(e.currentTarget);
-            $target.toggleClass(classes.selectedBox)
+            $target.toggleClass(classes.selectedBox);
             const id = $target.data("id")
             const foundBox = self.boxes.find((box) => box.id === id);
             const foundBoxInSelected = self.selectedBoxes.find((box) => box.id === id);
@@ -383,25 +386,86 @@ main = ($) => {
                 self.selectedBoxes.push(foundBox);
                 self.setSelectedInputValues();
             }
+            console.log(self.selectedBoxes)
         })
 
         $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
-            const { clientX, clientY } = e;
+            const { clientX, clientY, pageX, pageY } = e;
+
             $(selectors.mouseCircle).css({
                 left: `${clientX}px`,
                 top: `${clientY}px`
             })
-        }, 0.1))
+
+            if (!self.draggingBox) return;
+
+            const $boxContainer = $(selectors.boxContainer);
+            const boxContainerOffset = $boxContainer.offset();
+            const scrollLeft = $boxContainer.scrollLeft();
+            const scrollTop = $boxContainer.scrollTop();
+
+            const relativeX = pageX - boxContainerOffset.left + scrollLeft;
+            const relativeY = pageY - boxContainerOffset.top + scrollTop;
+
+            const left = relativeX - self.dragOffset.x;
+            const top = relativeY - self.dragOffset.y;
+
+            self.draggingBox.css({
+                left: (left) + "px",
+                top: (top) + "px",
+            })
+            console.log(self.draggingBox.position())
+
+        }, 0))
 
         $(document).on("mousedown.eventListener", selectors.body, self.debounce((e) => {
             self.mouseDown = true;
             self.fillMouseCircle();
-        }, 3))
+        }, 0))
 
         $(document).on("mouseup.eventListener", selectors.body, self.debounce((e) => {
             self.mouseDown = false;
             self.fillMouseCircle();
-        }, 3))
+            if (self.draggingBox) {
+                const id = self.draggingBox.data("id");
+                const boxFound = self.boxes.find((box) => box.id === id);
+                if (boxFound) {
+                    const position = self.draggingBox.position();
+                    boxFound.boxPosition = { top: position.top + "px", left: position.left + "px" };
+                }
+                self.draggingBox = null;
+            }
+        }, 0))
+
+        $(document).on("mousedown.eventListener", selectors.box, self.debounce((e) => {
+            e.preventDefault();
+            const { clientX, clientY, target, pageX, pageY } = e;
+            self.draggingBox = $(target);
+
+
+            const $boxContainer = $(selectors.boxContainer);
+            const boxContainerOffset = $boxContainer.offset();
+            const scrollLeft = $boxContainer.scrollLeft();
+            const scrollTop = $boxContainer.scrollTop();
+            const position = self.draggingBox.position();
+
+            self.dragOffset.x = pageX - boxContainerOffset.left + scrollLeft - position.left;
+            self.dragOffset.y = pageY - boxContainerOffset.top + scrollTop - position.top;
+            self.draggingBox.css("position", "absolute");
+        }, 0))
+
+        $(document).on("mouseup.eventListener", selectors.box, self.debounce((e) => {
+            if (!self.draggingBox) return;
+
+            const position = self.draggingBox.position();
+            const id = self.draggingBox.data("id");
+            const boxFound = self.boxes.find((box) => box.id === id);
+
+            if (boxFound) {
+                boxFound.boxPosition = {top: position.top+"px", left: position.left+"px"};
+            }
+            self.draggingBox = null;
+        }, 0))
 
     }
 
@@ -436,7 +500,20 @@ main = ($) => {
                         const color = box.boxProps["box-shadow-color"] || "";
                         $html.css({ "box-shadow": `0 0 ${size} ${color}` });
                     }
-                    $html.css(box.boxProps)
+                    $html.css(box.boxProps);
+                }
+                if (box.boxPosition){
+                    $html.css({ 
+                        top: box.boxPosition.top, 
+                        left: box.boxPosition.left, 
+                        position: "absolute" 
+                    });
+                }else {
+                    $html.css({
+                        top: "0px",
+                        left: "0px",
+                        position:"absolute",
+                    })
                 }
                 $(selectors.boxContainer).append($html);
             })
@@ -556,10 +633,18 @@ main = ($) => {
         const html = `<div class=${classes.box} data-id=${id}> BOX </div>`;
         $(selectors.boxContainer).append(html);
 
+        const $box = $(selectors.box).last();
+        $box.css({
+            position:"absolute",
+            top:"0px",
+            left:"0px",
+        })
+
         const box = {
             id: id,
             html: html,
             boxProps: {},
+            boxPosition: boxPosition,
         }
         self.boxes.push(box);
     }
@@ -586,6 +671,11 @@ main = ($) => {
     self.fillMouseCircle = () => {
         const $mouseCircle = $(selectors.mouseCircle);
         $mouseCircle.toggleClass(classes.mouseCircleFilled);
+    }
+
+    self.getBoxPosition = ($box) => {
+        const position = $box.position();
+        return {top: (position.top) + "px", left: (position.left) + "px"};
     }
 
 
