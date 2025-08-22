@@ -15,6 +15,7 @@ main = ($) => {
         boxContainer: "box-container",
         box: "box",
         selectedBox: "selected-box",
+        iconSelecBox: "icon-select-box",
         panel: "panel",
         inputContainer: "input-container",
         panelLabel: "panel-label",
@@ -147,7 +148,6 @@ main = ($) => {
             gap: 1rem;
             flex-wrap: wrap;
             margin: 1rem;
-            position: relative;
         }
 
         ${selectors.box}{
@@ -165,8 +165,18 @@ main = ($) => {
             position: absolute;
         }
 
-        ${selectors.selectedBox}{
-            transform: rotate(45deg);
+        ${selectors.iconSelecBox}{
+            position: absolute;
+            right: 0;
+            top: 0;
+            border: 1px solid ${root["color-1"]};
+            border-radius: ${root["rounded-md"]};
+            background-color: ${root["color-1"]};
+            width: 1rem;
+            height: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         ${selectors.panel}{
@@ -274,6 +284,7 @@ main = ($) => {
             background-color: ${root["color-2"]};
         }
 
+
         @media (max-width: 1200px){
             ${selectors.container}{
                 flex-direction: column;
@@ -375,22 +386,11 @@ main = ($) => {
 
         $(document).on("click.eventListener", selectors.box, (e) => {
             const $target = $(e.currentTarget);
-            $target.toggleClass(classes.selectedBox);
-            const id = $target.data("id")
-            const foundBox = self.boxes.find((box) => box.id === id);
-            const foundBoxInSelected = self.selectedBoxes.find((box) => box.id === id);
-
-            if (foundBoxInSelected) {
-                self.selectedBoxes = self.selectedBoxes.filter((box) => box.id !== id);
-            } else {
-                self.selectedBoxes.push(foundBox);
-                self.setSelectedInputValues();
-            }
-            console.log(self.selectedBoxes)
+            self.toggleBox($target);
         })
 
         $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
-            const { clientX, clientY, pageX, pageY } = e;
+            const { clientX, clientY, offsetX, offsetY, pageX, pageY } = e;
 
             $(selectors.mouseCircle).css({
                 left: `${clientX}px`,
@@ -398,24 +398,13 @@ main = ($) => {
             })
 
             if (!self.draggingBox) return;
-
-            const $boxContainer = $(selectors.boxContainer);
-            const boxContainerOffset = $boxContainer.offset();
-            const scrollLeft = $boxContainer.scrollLeft();
-            const scrollTop = $boxContainer.scrollTop();
-
-            const relativeX = pageX - boxContainerOffset.left + scrollLeft;
-            const relativeY = pageY - boxContainerOffset.top + scrollTop;
-
-            const left = relativeX - self.dragOffset.x;
-            const top = relativeY - self.dragOffset.y;
+            if (!self.selectedBoxes.length) return;
 
             self.draggingBox.css({
-                left: (left) + "px",
-                top: (top) + "px",
+                top: pageY + "px",
+                left: pageX + "px",
+                transform: "translate(-50%,-50%)",
             })
-            console.log(self.draggingBox.position())
-
         }, 0))
 
         $(document).on("mousedown.eventListener", selectors.body, self.debounce((e) => {
@@ -426,45 +415,20 @@ main = ($) => {
         $(document).on("mouseup.eventListener", selectors.body, self.debounce((e) => {
             self.mouseDown = false;
             self.fillMouseCircle();
-            if (self.draggingBox) {
-                const id = self.draggingBox.data("id");
-                const boxFound = self.boxes.find((box) => box.id === id);
-                if (boxFound) {
-                    const position = self.draggingBox.position();
-                    boxFound.boxPosition = { top: position.top + "px", left: position.left + "px" };
-                }
-                self.draggingBox = null;
-            }
+            
+            if(!self.draggingBox) return;
+            const position = self.getBoxPosition(self.draggingBox);
+            const id = self.draggingBox.data("id");
+            const boxFound = self.boxes.find((box) => box.id ===id);
+            boxFound.boxPosition = position;
+
+            self.draggingBox = null;
         }, 0))
 
         $(document).on("mousedown.eventListener", selectors.box, self.debounce((e) => {
             e.preventDefault();
-            const { clientX, clientY, target, pageX, pageY } = e;
+            const { target } = e;
             self.draggingBox = $(target);
-
-
-            const $boxContainer = $(selectors.boxContainer);
-            const boxContainerOffset = $boxContainer.offset();
-            const scrollLeft = $boxContainer.scrollLeft();
-            const scrollTop = $boxContainer.scrollTop();
-            const position = self.draggingBox.position();
-
-            self.dragOffset.x = pageX - boxContainerOffset.left + scrollLeft - position.left;
-            self.dragOffset.y = pageY - boxContainerOffset.top + scrollTop - position.top;
-            self.draggingBox.css("position", "absolute");
-        }, 0))
-
-        $(document).on("mouseup.eventListener", selectors.box, self.debounce((e) => {
-            if (!self.draggingBox) return;
-
-            const position = self.draggingBox.position();
-            const id = self.draggingBox.data("id");
-            const boxFound = self.boxes.find((box) => box.id === id);
-
-            if (boxFound) {
-                boxFound.boxPosition = {top: position.top+"px", left: position.left+"px"};
-            }
-            self.draggingBox = null;
         }, 0))
 
     }
@@ -502,17 +466,17 @@ main = ($) => {
                     }
                     $html.css(box.boxProps);
                 }
-                if (box.boxPosition){
-                    $html.css({ 
-                        top: box.boxPosition.top, 
-                        left: box.boxPosition.left, 
-                        position: "absolute" 
+                if (box.boxPosition) {
+                    $html.css({
+                        top: box.boxPosition.top,
+                        left: box.boxPosition.left,
+                        position: "absolute"
                     });
-                }else {
+                } else {
                     $html.css({
                         top: "0px",
                         left: "0px",
-                        position:"absolute",
+                        position: "absolute",
                     })
                 }
                 $(selectors.boxContainer).append($html);
@@ -634,11 +598,7 @@ main = ($) => {
         $(selectors.boxContainer).append(html);
 
         const $box = $(selectors.box).last();
-        $box.css({
-            position:"absolute",
-            top:"0px",
-            left:"0px",
-        })
+        const boxPosition = self.getBoxPosition($box);
 
         const box = {
             id: id,
@@ -675,7 +635,26 @@ main = ($) => {
 
     self.getBoxPosition = ($box) => {
         const position = $box.position();
-        return {top: (position.top) + "px", left: (position.left) + "px"};
+        return { top: (position.top) + "px", left: (position.left) + "px" };
+    }
+
+    self.toggleBox = ($box) => {
+        $box.toggleClass(classes.selectedBox);
+        const id = $box.data("id")
+        const foundBox = self.boxes.find((box) => box.id === id);
+        const foundBoxInSelected = self.selectedBoxes.find((box) => box.id === id);
+
+        if (foundBoxInSelected) {
+            const $html = $box.find(selectors.iconSelecBox);
+            $html.remove();
+            self.selectedBoxes = self.selectedBoxes.filter((box) => box.id !== id);
+        } else {
+            const $html = $(`<div class=${classes.iconSelecBox}> ${icons.success} </div>`)
+            $box.append($html);
+            self.selectedBoxes.push(foundBox);
+            self.setSelectedInputValues();
+        }
+
     }
 
 
