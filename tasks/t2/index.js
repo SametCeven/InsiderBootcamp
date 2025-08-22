@@ -87,9 +87,7 @@ main = ($) => {
         const html =
             `
             <div class=${classes.container}>
-                <div class=${classes.boxContainer}>
-                    
-                </div>
+                <div class=${classes.boxContainer}></div>
                 <div class=${classes.panel}>
                     <h2> Panel </h2>
                     <div class=${classes.buttonContainer}>
@@ -122,8 +120,6 @@ main = ($) => {
             padding: 0;
             font-family: arial;
             background-color: ${root["color-1"]};
-            width: 100vw;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -135,6 +131,7 @@ main = ($) => {
             justify-content: center;
             align-items: center;
             gap: 3rem;
+            padding: 3rem;
         }
 
         ${selectors.boxContainer}{
@@ -147,6 +144,7 @@ main = ($) => {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
+            margin: 1rem;
         }
 
         ${selectors.box}{
@@ -271,6 +269,56 @@ main = ($) => {
         ${selectors.mouseCircleFilled}{
             background-color: ${root["color-2"]};
         }
+
+        @media (max-width: 1200px){
+            ${selectors.container}{
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0;
+            }
+            ${selectors.boxContainer}{
+                height: 20rem;
+            }
+            ${selectors.panel}{
+                margin: 0 2rem;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+            ${selectors.inputContainer}{
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            ${selectors.panelLabel}{
+                width: 15rem;
+                gap: 1rem;
+            }
+            ${selectors.panelInput}{
+                width: 5rem;
+            }
+        }
+        @media (max-width: 800px){
+            ${selectors.boxContainer}{
+                width: 20rem;
+                height: 15rem;
+            }
+            ${selectors.panel}{
+                margin: 0 0.5rem;
+            }
+        }
+        @media (max-width: 600px){
+            ${selectors.boxContainer}{
+                height: 10rem;
+            }
+        }
+        @media (max-width: 400px){
+            ${selectors.panelLabel}{
+                width: 10rem;
+            }
+            ${selectors.panelInput}{
+                width: 3rem;
+            }
+        }
         
 
         </style>`;
@@ -337,8 +385,8 @@ main = ($) => {
             }
         })
 
-        $(document).on("mousemove.eventListener", selectors.body, self.debounce((e)=>{
-            const {clientX, clientY} = e;
+        $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
+            const { clientX, clientY } = e;
             $(selectors.mouseCircle).css({
                 left: `${clientX}px`,
                 top: `${clientY}px`
@@ -388,7 +436,6 @@ main = ($) => {
                         const color = box.boxProps["box-shadow-color"] || "";
                         $html.css({ "box-shadow": `0 0 ${size} ${color}` });
                     }
-
                     $html.css(box.boxProps)
                 }
                 $(selectors.boxContainer).append($html);
@@ -518,7 +565,7 @@ main = ($) => {
     }
 
     self.deleteBox = () => {
-        const idsToDelete = self.selectedBoxes.map((box)=> box.id);
+        const idsToDelete = self.selectedBoxes.map((box) => box.id);
         const $boxes = $(selectors.box)
 
         $boxes.each((index, box) => {
@@ -537,8 +584,8 @@ main = ($) => {
     }
 
     self.fillMouseCircle = () => {
-            const $mouseCircle = $(selectors.mouseCircle);
-            $mouseCircle.toggleClass(classes.mouseCircleFilled);
+        const $mouseCircle = $(selectors.mouseCircle);
+        $mouseCircle.toggleClass(classes.mouseCircleFilled);
     }
 
 
