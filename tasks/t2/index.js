@@ -392,7 +392,7 @@ main = ($) => {
         })
 
         $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
-            const { clientX, clientY, offsetX, offsetY, pageX, pageY } = e;
+            const { clientX, clientY, pageX, pageY } = e;
 
             $(selectors.mouseCircle).css({
                 left: `${clientX}px`,
@@ -421,11 +421,11 @@ main = ($) => {
         $(document).on("mouseup.eventListener", selectors.body, self.debounce((e) => {
             self.mouseDown = false;
             self.fillMouseCircle();
-            
-            if(!self.draggingBox) return;
+
+            if (!self.draggingBox) return;
             const position = self.getBoxPosition(self.draggingBox);
             const id = self.draggingBox.data("id");
-            const boxFound = self.boxes.find((box) => box.id ===id);
+            const boxFound = self.boxes.find((box) => box.id === id);
             boxFound.boxPosition = position;
 
             self.draggingBox = null;
@@ -441,6 +441,54 @@ main = ($) => {
             self.renderInitialBoxes();
         })
 
+        document.addEventListener("touchmove", (e) => {
+            setTimeout(() => {
+                const { pageX, pageY } = e.touches[0];
+
+                console.log(self.selectedBoxes)
+                e.preventDefault();
+                if (!self.draggingBox || !self.selectedBoxes.length) return;
+
+                const $boxContainer = $(selectors.boxContainer);
+                const boxContainerOffset = $boxContainer.offset();
+                const left = pageX - boxContainerOffset.left;
+                const top = pageY - boxContainerOffset.top;
+
+                self.draggingBox.css({
+                    top: top + "px",
+                    left: left + "px",
+                    transform: "none",
+                })
+            }, 1)
+
+        }, { passive: false })
+
+        document.addEventListener("touchstart", (e) => {
+            self.mouseDown = true;
+            self.fillMouseCircle();
+
+            const touch = e.touches[0];
+            const target = touch.target.closest(selectors.box);
+            if (!target) return;
+
+            e.preventDefault();
+            self.toggleBox($(target))
+            self.draggingBox = $(target);
+            console.log(self.selectedBoxes)
+        }, { passive: false })
+
+        document.addEventListener("touchend", (e) => {
+            self.mouseDown = false;
+            self.fillMouseCircle();
+            if (!self.draggingBox) return;
+
+            const position = self.getBoxPosition(self.draggingBox);
+            const id = self.draggingBox.data("id");
+            const boxFound = self.boxes.find((box) => box.id === id);
+            boxFound.boxPosition = position;
+            self.draggingBox = null;
+            console.log(self.selectedBoxes)
+        }, { passive: false })
     }
 
     //  ---------- UTILS --------------
