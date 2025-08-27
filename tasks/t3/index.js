@@ -23,28 +23,31 @@ main = ($) => {
     }
     );
 
-    const self = {
-        partners: ["https://www.lcw.com", "https://www.turkcell.com.tr", "barcin"],
-        config: {
-            lcw: {
-                partnerName: "lcw",
-                pageType: {
-                    mainPage: "Home",
-                    cartPage: "Shop",
-                    productPage: "Model",
-                    categoryPage: ".product-list-container",
-                },
+    const config = {
+        lcw: {
+            url: "https://www.lcw.com",
+            partnerName: "lcw",
+            pageType: {
+                mainPage: "Home",
+                cartPage: "Shop",
+                productPage: "Model",
+                categoryPage: ".product-list-container",
             },
-            turkcell: {
-                partnerName: "turkcell",
-            },
-            barcin: {
-                partnerName: "barcin",
-            }
         },
-        currentPartner: "",
-        URL: "",
-        pageType: "",
+        turkcell: {
+            url: "https://www.turkcell.com.tr",
+            partnerName: "turkcell",
+        },
+        barcin: {
+            url: "https://www.barcin.com",
+            partnerName: "barcin",
+        }
+    }
+
+    const self = {
+        currentPartnerName: "",
+        currentURL: "",
+        currentPageType: "",
     }
 
     self.init = () => {
@@ -67,33 +70,19 @@ main = ($) => {
     // ---- LOGIC ---- //
 
     self.getInitialInfo = () => {
-        self.URL = document.URL;
-        self.pageType = window.CurrentPageType;
+        self.currentURL = document.URL;
+        self.currentPageType = window.CurrentPageType;
 
-        if (self.URL.includes(self.config.lcw.partnerName)) {
-            self.currentPartner = self.config.lcw.partnerName;
-        } else if (self.URL.includes(self.config.turkcell.partnerName)) {
-            self.currentPartner = self.config.turkcell.partnerName;
-        } else if (self.URL.includes(self.config.barcin.partnerName)) {
-            self.currentPartner = self.config.barcin.partnerName;
-        }
-    }
-
-
-    self.isPartner = () => {
-        let isPartner = false;
-        self.partners.forEach((p) => {
-            if (self.URL.includes(p)) isPartner = true;
-        })
-        return isPartner;
+        const partner = Object.values(config).find((p) => self.currentURL.includes(p.url));
+        self.currentPartnerName = partner ? partner.partnerName : "";
     }
 
     self.checkPartner = (partner) => {
-        if (!self.isPartner()) {
+        if (!self.currentPartnerName) {
             console.error("Not a partner !!!");
             return false;
         }
-        if (self.currentPartner !== self.config[partner].partnerName) {
+        if (self.currentPartnerName !== config[partner].partnerName) {
             console.error("Wrong partner !!!");
             return false;
         }
@@ -104,28 +93,28 @@ main = ($) => {
 
     self.lcwIsOnMainPage = () => {
         if (!self.checkPartner("lcw")) return false;
-        if (self.pageType === self.config.lcw.pageType.mainPage) return true;
+        if (self.currentPageType === config.lcw.pageType.mainPage) return true;
         else return false;
     }
 
     self.lcwIsOnCartPage = () => {
         if (!self.checkPartner("lcw")) return false;
-        if (self.pageType === self.config.lcw.pageType.cartPage) return true;
+        if (self.currentPageType === config.lcw.pageType.cartPage) return true;
         else return false;
     }
 
     self.lcwIsOnProductPage = () => {
         if (!self.checkPartner("lcw")) return false;
-        if (self.pageType === self.config.lcw.pageType.productPage) return true;
+        if (self.currentPageType === config.lcw.pageType.productPage) return true;
         else return false;
     }
 
     self.lcwIsOnCategoryPage = () => {
         if (!self.checkPartner("lcw")) return false;
 
-        const $categoryPage = $(document).find(self.config.lcw.pageType.categoryPage);
+        const $categoryPage = $(document).find(config.lcw.pageType.categoryPage);
         if ($categoryPage.length < 1) return false;
-        self.pageType = self.config.lcw.pageType.categoryPage;
+        self.currentPageType = config.lcw.pageType.categoryPage;
         return true;
     }
 
@@ -167,16 +156,16 @@ main = ($) => {
         console.log(self.pageType);
         console.log("********")
 
-        console.log("lcw","main page", self.lcwIsOnMainPage());
-        console.log("lcw","product page", self.lcwIsOnProductPage());
-        console.log("lcw","category page", self.lcwIsOnCategoryPage());
-        console.log("lcw","cart page", self.lcwIsOnCartPage());
-        
-        console.log("turkcell","main page", self.turkcellIsOnMainPage());
-        console.log("turkcell","product page", self.turkcellIsOnProductPage());
-        console.log("turkcell","category page", self.turkcellIsOnCategoryPage());
-        console.log("turkcell","cart page", self.turkcellIsOnCartPage());
-        
+        console.log("lcw /", "main page /", self.lcwIsOnMainPage());
+        console.log("lcw /", "product page /", self.lcwIsOnProductPage());
+        console.log("lcw /", "category page /", self.lcwIsOnCategoryPage());
+        console.log("lcw /", "cart page /", self.lcwIsOnCartPage());
+
+        console.log("turkcell /", "main page /", self.turkcellIsOnMainPage());
+        console.log("turkcell /", "product page /", self.turkcellIsOnProductPage());
+        console.log("turkcell /", "category page /", self.turkcellIsOnCategoryPage());
+        console.log("turkcell /", "cart page /", self.turkcellIsOnCartPage());
+
     }
 
 
