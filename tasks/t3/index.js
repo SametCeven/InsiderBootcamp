@@ -39,9 +39,9 @@ main = ($) => {
             partnerName: "turkcell",
             pageType: {
                 mainPage: 5,
-                cartPage: "pasaj/siparisler",
+                cartPage: "/pasaj/siparisler",
                 productPage: [/product-detail-page/,/DetailArea/,/campaign-details/,/packages-detail/,/Detail_detail__content/],
-                categoryPage: [/personaclick-recommend/,/package-selection/,/--filterArea__/,/ListFilter_filterItem/,/campaign-list-filter/],
+                categoryPage: [/package-selection/,/--filterArea__/,/ListFilter_filterItem/,/campaign-list-filter/],
             }
         },
         barcin: {
@@ -60,6 +60,7 @@ main = ($) => {
         currentPartnerName: "",
         currentURL: "",
         currentPageType: "",
+        currentPathName: "",
     }
 
     self.init = () => {
@@ -83,6 +84,7 @@ main = ($) => {
     self.getInitialInfo = () => {
         self.currentURL = window.location.hostname;
         self.currentPageType = window.CurrentPageType;
+        self.currentPathName = window.location.pathname;
 
         const partner = Object.values(config).find((p) => {
             return p.url.some((u)=>{
@@ -145,7 +147,7 @@ main = ($) => {
 
     self.turkcellIsOnCartPage = () => {
         if (!self.checkPartner("turkcell")) return false;
-        if (self.currentURL.includes(config.turkcell.pageType.cartPage)) return true;
+        if (self.currentPathName.includes(config.turkcell.pageType.cartPage)) return true;
         return false;
     }
 
@@ -192,6 +194,7 @@ main = ($) => {
     }
 
     self.barcinIsOnProductPage = () => {
+        if (!self.checkPartner("barcin")) return false;
         const $matches = $(document).find(`*[data-testid]`).filter(function(){
             return config.barcin.pageType.productPage.some((regex)=>{
                 return regex.test(this.getAttribute("data-testid"));
