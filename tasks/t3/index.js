@@ -10,7 +10,7 @@ main = ($) => {
     "use strict";
 
     const classes = {
-        container: "container",
+        container: "mycontainerins",
     }
 
     const selectors = Object.keys(classes).reduce(
@@ -25,7 +25,7 @@ main = ($) => {
 
     const config = {
         lcw: {
-            url: "https://www.lcw.com",
+            url: ["https://www.lcw.com"],
             partnerName: "lcw",
             pageType: {
                 mainPage: "Home",
@@ -35,11 +35,17 @@ main = ($) => {
             },
         },
         turkcell: {
-            url: "https://www.turkcell.com.tr",
+            url: ["https://www.turkcell.com.tr", "https://www.superonline.net/"],
             partnerName: "turkcell",
+            pageType: {
+                mainPage: 5,
+                cartPage: "pasaj/siparisler",
+                productPage: [/product-detail-page/,/DetailArea/,/campaign-details/,/packages-detail/,/Detail_detail__content/],
+                categoryPage: [/personaclick-recommend/,/package-selection/,/--filterArea__/,/ListFilter_filterItem/,/campaign-list-filter/],
+            }
         },
         barcin: {
-            url: "https://www.barcin.com",
+            url: ["https://www.barcin.com"],
             partnerName: "barcin",
         }
     }
@@ -73,7 +79,11 @@ main = ($) => {
         self.currentURL = document.URL;
         self.currentPageType = window.CurrentPageType;
 
-        const partner = Object.values(config).find((p) => self.currentURL.includes(p.url));
+        const partner = Object.values(config).find((p) => {
+            return p.url.some((u)=>{
+                return self.currentURL.includes(u);
+            })
+        });
         self.currentPartnerName = partner ? partner.partnerName : "";
     }
 
@@ -123,22 +133,37 @@ main = ($) => {
 
     self.turkcellIsOnMainPage = () => {
         if (!self.checkPartner("turkcell")) return false;
-        return "main page"
+        const $target = $(document).find("section")
+        if($target.length === config.turkcell.pageType.mainPage) return true;
+        else return false;
     }
 
     self.turkcellIsOnCartPage = () => {
         if (!self.checkPartner("turkcell")) return false;
-        return "cart page"
+        if (self.currentURL.includes(config.turkcell.pageType.cartPage)) return true;
+        return false;
     }
 
     self.turkcellIsOnProductPage = () => {
         if (!self.checkPartner("turkcell")) return false;
-        return "product page"
+        const $matches = $(document).find(`*[class]`).filter(function(){
+            return config.turkcell.pageType.productPage.some((regex)=>{
+                return regex.test(this.className);
+            })
+        })
+        if($matches.length >= 1) return true;
+        else return false; 
     }
 
     self.turkcellIsOnCategoryPage = () => {
         if (!self.checkPartner("turkcell")) return false;
-        return "category page"
+        const $matches = $(document).find(`*[class]`).filter(function(){
+            return config.turkcell.pageType.categoryPage.some((regex)=>{
+                return regex.test(this.className);
+            })
+        })
+        if($matches.length >= 1) return true;
+        else return false; 
     }
 
     // ---- BARCIN --- //
@@ -151,15 +176,20 @@ main = ($) => {
         console.log($(document))
         console.log(document)
         console.log(window)
-        console.log(document.URL)
-        console.log(self.URL);
-        console.log(self.pageType);
+        //console.log(document.URL)
+        //console.log(self.URL);
+        //console.log(self.pageType);
+        console.log("********")
+        /* console.log($(document).find("#__NEXT_DATA__"))
+        console.log($(document).find("#__NEXT_DATA__")[0].innerHTML)
+        console.log(JSON.parse($(document).find("#__NEXT_DATA__")[0].innerHTML).query.slug) */
+
         console.log("********")
 
-        console.log("lcw /", "main page /", self.lcwIsOnMainPage());
+        /* console.log("lcw /", "main page /", self.lcwIsOnMainPage());
         console.log("lcw /", "product page /", self.lcwIsOnProductPage());
         console.log("lcw /", "category page /", self.lcwIsOnCategoryPage());
-        console.log("lcw /", "cart page /", self.lcwIsOnCartPage());
+        console.log("lcw /", "cart page /", self.lcwIsOnCartPage()); */
 
         console.log("turkcell /", "main page /", self.turkcellIsOnMainPage());
         console.log("turkcell /", "product page /", self.turkcellIsOnProductPage());
