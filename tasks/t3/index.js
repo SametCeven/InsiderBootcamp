@@ -142,7 +142,7 @@ main = ($) => {
         if (!self.checkPartner(config.turkcell.partnerName)) return false;
         const $target = $(document).find("section")
         if($target.length === config.turkcell.pageType.mainPage) return true;
-        else return false;
+        return false;
     }
 
     self.turkcellIsOnCartPage = () => {
@@ -159,7 +159,7 @@ main = ($) => {
             })
         })
         if($matches.length >= 1) return true;
-        else return false; 
+        return false; 
     }
 
     self.turkcellIsOnCategoryPage = () => {
@@ -170,7 +170,7 @@ main = ($) => {
             })
         })
         if($matches.length >= 1) return true;
-        else return false; 
+        return false; 
     }
 
     // ---- BARCIN --- //
