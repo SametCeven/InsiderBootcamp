@@ -109,25 +109,25 @@ main = ($) => {
     // ---- LCW --- //
 
     self.lcwIsOnMainPage = () => {
-        if (!self.checkPartner("lcw")) return false;
+        if (!self.checkPartner(config.lcw.partnerName)) return false;
         if (self.currentPageType === config.lcw.pageType.mainPage) return true;
         else return false;
     }
 
     self.lcwIsOnCartPage = () => {
-        if (!self.checkPartner("lcw")) return false;
+        if (!self.checkPartner(config.lcw.partnerName)) return false;
         if (self.currentPageType === config.lcw.pageType.cartPage) return true;
         else return false;
     }
 
     self.lcwIsOnProductPage = () => {
-        if (!self.checkPartner("lcw")) return false;
+        if (!self.checkPartner(config.lcw.partnerName)) return false;
         if (self.currentPageType === config.lcw.pageType.productPage) return true;
         else return false;
     }
 
     self.lcwIsOnCategoryPage = () => {
-        if (!self.checkPartner("lcw")) return false;
+        if (!self.checkPartner(config.lcw.partnerName)) return false;
 
         const $categoryPage = $(document).find(config.lcw.pageType.categoryPage);
         if ($categoryPage.length < 1) return false;
@@ -139,20 +139,20 @@ main = ($) => {
     // ---- TURKCELL --- //
 
     self.turkcellIsOnMainPage = () => {
-        if (!self.checkPartner("turkcell")) return false;
+        if (!self.checkPartner(config.turkcell.partnerName)) return false;
         const $target = $(document).find("section")
         if($target.length === config.turkcell.pageType.mainPage) return true;
         else return false;
     }
 
     self.turkcellIsOnCartPage = () => {
-        if (!self.checkPartner("turkcell")) return false;
+        if (!self.checkPartner(config.turkcell.partnerName)) return false;
         if (self.currentPathName.includes(config.turkcell.pageType.cartPage)) return true;
         return false;
     }
 
     self.turkcellIsOnProductPage = () => {
-        if (!self.checkPartner("turkcell")) return false;
+        if (!self.checkPartner(config.turkcell.partnerName)) return false;
         const $matches = $(document).find(`*[class]`).filter(function(){
             return config.turkcell.pageType.productPage.some((regex)=>{
                 return regex.test(this.className);
@@ -163,7 +163,7 @@ main = ($) => {
     }
 
     self.turkcellIsOnCategoryPage = () => {
-        if (!self.checkPartner("turkcell")) return false;
+        if (!self.checkPartner(config.turkcell.partnerName)) return false;
         const $matches = $(document).find(`*[class]`).filter(function(){
             return config.turkcell.pageType.categoryPage.some((regex)=>{
                 return regex.test(this.className);
@@ -176,7 +176,7 @@ main = ($) => {
     // ---- BARCIN --- //
 
     self.barcinIsOnMainPage = () => {
-        if (!self.checkPartner("barcin")) return false;
+        if (!self.checkPartner(config.barcin.partnerName)) return false;
         const $matches = $(document).find(`*[id]`).filter(function(){
             return config.barcin.pageType.mainPage.some((regex)=>{
                 return regex.test(this.id);
@@ -187,14 +187,14 @@ main = ($) => {
     }
 
     self.barcinIsOnCartPage = () => {
-        if (!self.checkPartner("barcin")) return false;
+        if (!self.checkPartner(config.barcin.partnerName)) return false;
         const pathname = window.location.pathname;
         if(pathname.includes(config.barcin.pageType.cartPage)) return true;
         return false;
     }
 
     self.barcinIsOnProductPage = () => {
-        if (!self.checkPartner("barcin")) return false;
+        if (!self.checkPartner(config.barcin.partnerName)) return false;
         const $matches = $(document).find(`*[data-testid]`).filter(function(){
             return config.barcin.pageType.productPage.some((regex)=>{
                 return regex.test(this.getAttribute("data-testid"));
@@ -205,7 +205,7 @@ main = ($) => {
     }
 
     self.barcinIsOnCategoryPage = () => {
-        if (!self.checkPartner("barcin")) return false;
+        if (!self.checkPartner(config.barcin.partnerName)) return false;
         const $matches = $(document).find(`*[class]`).filter(function(){
             return config.barcin.pageType.categoryPage.some((regex)=>{
                 return regex.test(this.className);
