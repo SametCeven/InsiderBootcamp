@@ -61,12 +61,14 @@ box = ($) => {
         selectInputs: [
             { "title": "Font Weigth", "options": [{ "name": "Bold", "value": 900 }, { "name": "Semi-Bold", "value": 600 }, { "name": "Light", "value": 200 }], "data-style": "font-weight" },
             { "title": "Partner Name", "options": [{ "name": "LCW", "value": "lcw" }, { "name": "Turkcell", "value": "turkcell" }, { "name": "Barçın", "value": "barcin" }], "data-partner": true },
+            { "title": "Campaign Page", "options": [{ "name": "Main Page", "value": "mainpage" }, { "name": "Cart Page", "value": "cartpage" }, { "name": "Product Page", "value": "productpage" }, { "name": "Category Page", "value": "categorypage" }], "data-page": true },
         ],
         boxes: [],
         selectedBoxes: [],
         mouseDown: false,
         draggingBox: null,
         dragOffset: { x: 0, y: 0 },
+        boxWindowSize: {innerWidth:null, innerHeight:null},
     }
 
     const icons = {
@@ -172,6 +174,10 @@ box = ($) => {
             position: absolute;
             user-select: none;
             -webkit-user-select: none;
+            z-index: 9998;
+            text-align: center;
+            padding: 0;
+            marging: 0;
         }
 
         ${selectors.iconSelecBox}{
@@ -361,11 +367,15 @@ box = ($) => {
             const dataStyleSuffix = $target.data("styleSuffix") || "";
             const id = $selectedBox.data("id");
             const isPartnerSelect = $target.is("select") && $target.data("partner");
+            const isPageSelect = $target.is("select") && $target.data("page");
             const boxFound = self.selectedBoxes.find((box) => box.id === id)
 
             if (isPartnerSelect) {
                 boxFound.partner = val;
                 $selectedBox.data("partner", val);
+            } else if(isPageSelect){
+                boxFound.page = val;
+                $selectedBox.data("page",val);
             } else {
                 let boxProps = {};
                 boxProps[dataStyle] = val + dataStyleSuffix;
@@ -401,9 +411,12 @@ box = ($) => {
         });
 
         $(document).on("click.eventListener", selectors.buttonAddtopage, (e) => {
-            console.log(globalConfig)
-
-            //self.reset();
+            const windowSizeWidth = $(document.body).prop("scrollWidth");
+            const windowSizeHeight = $(document.body).prop("scrollHeight");
+            const widthMultiple = windowSizeWidth/self.boxWindowSize.innerWidth;
+            const heightMultiple = windowSizeHeight/self.boxWindowSize.innerHeight;
+            self.renderInitialBoxes(selectors.body,widthMultiple,heightMultiple);
+            self.reset();
         });
 
         $(document).on("click.eventListener", selectors.buttonClosepopup, (e) => {
@@ -429,6 +442,9 @@ box = ($) => {
             const boxContainerOffset = $boxContainer.offset();
             const left = pageX - boxContainerOffset.left;
             const top = pageY - boxContainerOffset.top;
+
+            self.boxWindowSize.innerWidth = $boxContainer.width();
+            self.boxWindowSize.innerHeight = $boxContainer.height();
 
             self.draggingBox.css({
                 top: top + "px",
@@ -529,7 +545,7 @@ box = ($) => {
         }
     }
 
-    self.renderInitialBoxes = () => {
+    self.renderInitialBoxes = (location = selectors.boxContainer,widthMultiple = 1,heightMultiple = 1) => {
         const localBoxes = self.getLocalStorage("boxes");
         if (localBoxes) {
             self.boxes = localBoxes;
@@ -545,9 +561,11 @@ box = ($) => {
                     $html.css(box.boxProps);
                 }
                 if (box.boxPosition) {
+                    const topFloat = parseFloat(box.boxPosition.top);
+                    const leftFloat = parseFloat(box.boxPosition.left);
                     $html.css({
-                        top: box.boxPosition.top,
-                        left: box.boxPosition.left,
+                        top: topFloat*heightMultiple+"px",
+                        left: leftFloat*widthMultiple+"px",
                         position: "absolute"
                     });
                 } else {
@@ -560,7 +578,10 @@ box = ($) => {
                 if (box.partner) {
                     $html.data("partner", box.partner);
                 }
-                $(selectors.boxContainer).append($html);
+                if (box.page){
+                    $html.data("page", box.page);
+                }
+                $(location).append($html);
             })
         }
     }
@@ -620,6 +641,7 @@ box = ($) => {
             $select.data("style", input["data-style"]);
             $select.data("styleSuffix", input["data-styleSuffix"]);
             if (input["data-partner"]) $select.data("partner", true);
+            if (input["data-page"]) $select.data("page", true);
             $(selectors.inputContainer).append($html);
         })
     }
@@ -649,6 +671,9 @@ box = ($) => {
             if ($select.length) {
                 if ($select.data("partner") !== undefined) {
                     const val = selectedBox.partner || "";
+                    $select.val(val);
+                } else if($select.data("page") !== undefined){
+                    const val = selectedBox.page || "";
                     $select.val(val);
                 } else {
                     const dataStyle = $select.data("style");
@@ -694,6 +719,7 @@ box = ($) => {
             boxProps: {},
             boxPosition: boxPosition,
             partner: null,
+            page: null,
         }
         self.boxes.push(box);
     }

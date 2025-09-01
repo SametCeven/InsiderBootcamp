@@ -8,7 +8,7 @@
     document.head.append(jqueryScript);
 })();
 
-const globalConfig = {rules:null,};
+let globalConfig = {};
 
 rules = ($) => {
     "use strict";
@@ -226,7 +226,7 @@ rules = ($) => {
         window.fn = self.testConfig;
     }
 
-    globalConfig.rules = self.testConfig;
+    globalConfig = self.testConfig;
 
     $(document).ready(self.init);
 }
@@ -285,6 +285,7 @@ box = ($) => {
         selectInputs: [
             { "title": "Font Weigth", "options": [{ "name": "Bold", "value": 900 }, { "name": "Semi-Bold", "value": 600 }, { "name": "Light", "value": 200 }], "data-style": "font-weight" },
             { "title": "Partner Name", "options": [{ "name": "LCW", "value": "lcw" }, { "name": "Turkcell", "value": "turkcell" }, { "name": "Barçın", "value": "barcin" }], "data-partner": true },
+            { "title": "Campaign Page", "options": [{ "name": "Main Page", "value": "mainpage" }, { "name": "Cart Page", "value": "cartpage" }, { "name": "Product Page", "value": "productpage" }, { "name": "Category Page", "value": "categorypage" }], "data-page": true },
         ],
         boxes: [],
         selectedBoxes: [],
@@ -590,11 +591,15 @@ box = ($) => {
             const dataStyleSuffix = $target.data("styleSuffix") || "";
             const id = $selectedBox.data("id");
             const isPartnerSelect = $target.is("select") && $target.data("partner");
+            const isPageSelect = $target.is("select") && $target.data("page");
             const boxFound = self.selectedBoxes.find((box) => box.id === id)
 
             if (isPartnerSelect) {
                 boxFound.partner = val;
                 $selectedBox.data("partner", val);
+            } else if(isPageSelect){
+                boxFound.page = val;
+                $selectedBox.data("page",val);
             } else {
                 let boxProps = {};
                 boxProps[dataStyle] = val + dataStyleSuffix;
@@ -630,6 +635,7 @@ box = ($) => {
         });
 
         $(document).on("click.eventListener", selectors.buttonAddtopage, (e) => {
+            if(!self.checkPartner()) return;
             const windowSizeWidth = $(document.body).prop("scrollWidth");
             const windowSizeHeight = $(document.body).prop("scrollHeight");
             const widthMultiple = windowSizeWidth/self.boxWindowSize.innerWidth;
@@ -797,6 +803,9 @@ box = ($) => {
                 if (box.partner) {
                     $html.data("partner", box.partner);
                 }
+                if (box.page){
+                    $html.data("page", box.page);
+                }
                 $(location).append($html);
             })
         }
@@ -857,6 +866,7 @@ box = ($) => {
             $select.data("style", input["data-style"]);
             $select.data("styleSuffix", input["data-styleSuffix"]);
             if (input["data-partner"]) $select.data("partner", true);
+            if (input["data-page"]) $select.data("page", true);
             $(selectors.inputContainer).append($html);
         })
     }
@@ -886,6 +896,9 @@ box = ($) => {
             if ($select.length) {
                 if ($select.data("partner") !== undefined) {
                     const val = selectedBox.partner || "";
+                    $select.val(val);
+                } else if($select.data("page") !== undefined){
+                    const val = selectedBox.page || "";
                     $select.val(val);
                 } else {
                     const dataStyle = $select.data("style");
@@ -931,6 +944,7 @@ box = ($) => {
             boxProps: {},
             boxPosition: boxPosition,
             partner: null,
+            page: null,
         }
         self.boxes.push(box);
     }
@@ -980,6 +994,12 @@ box = ($) => {
             self.selectedBoxes.push(foundBox);
             self.setSelectedInputValues();
         }
+    }
+
+    self.checkPartner = () => {
+        console.log(globalConfig)
+        console.log(self.selectedBoxes[0])
+        return true
     }
 
 
