@@ -12,12 +12,14 @@ box = ($) => {
 
     const classes = {
         style: "custom-style",
-        container: "my-ins-container",
+        commonStyle: "common-style",
+        container: "container",
         boxContainer: "box-container",
         box: "box",
         selectedBox: "selected-box",
         iconSelecBox: "icon-select-box",
         panel: "panel",
+        panelTitle: "panel-title",
         inputContainer: "input-container",
         panelLabel: "panel-label",
         panelInput: "panel-input",
@@ -68,11 +70,33 @@ box = ($) => {
         mouseDown: false,
         draggingBox: null,
         dragOffset: { x: 0, y: 0 },
-        boxWindowSize: {innerWidth:null, innerHeight:null},
+        boxWindowSize: { innerWidth: null, innerHeight: null },
+        defaultBoxProps: {
+            "all": "unset",
+            "background-color": "white",
+            "width": "15em",
+            "height": "15em",
+            "display": "flex",
+            "justify-content": "center",
+            "align-items": "center",
+            "border": "1px solid #00ADB5",
+            "border-radius": "10px",
+            "font-weight": "200",
+            "cursor": "pointer",
+            "position": "absolute",
+            "user-select": "none",
+            "-webkit-user-select": "none",
+            "z-index": "9998",
+            "text-align": "center",
+            "padding": "0",
+            "marging": "0",
+            "font-family": "arial",
+        }
     }
 
     const icons = {
         success: `<svg class=${classes.iconSuccess} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#3caa49"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
+        fail: `<svg fill="#c32222" viewBox="0 -8 528 528" xmlns="http://www.w3.org/2000/svg" stroke="#c32222"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><title>fail</title><path d="M264 456Q210 456 164 429 118 402 91 356 64 310 64 256 64 202 91 156 118 110 164 83 210 56 264 56 318 56 364 83 410 110 437 156 464 202 464 256 464 310 437 356 410 402 364 429 318 456 264 456ZM264 288L328 352 360 320 296 256 360 192 328 160 264 224 200 160 168 192 232 256 168 320 200 352 264 288Z"></path></g></svg>`,
     }
 
     self.init = () => {
@@ -89,24 +113,28 @@ box = ($) => {
     self.reset = () => {
         $(selectors.style).remove();
         $(document).off(".eventListener");
-        $(selectors.container).empty();
+        $(selectors.container).remove();
+        $(selectors.toastContainer).remove();
+        $(selectors.mouseCircle).remove();
     }
 
     self.buildHTML = () => {
         const html =
             `
-            <div class=${classes.container}>
-                <div class=${classes.boxContainer}></div>
-                <div class=${classes.panel}>
-                    <h2> Panel </h2>
-                    <div class=${classes.buttonContainer}>
-                        <button class=${classes.btn} data-btn="add">Add Box</button>
-                        <button class=${classes.btn} data-btn="delete">Delete Box</button>
+            <div class="${classes.container} ${classes.commonStyle}">
+                <div class="${classes.boxContainer} ${classes.commonStyle}"></div>
+                <div class="${classes.panel} ${classes.commonStyle}">
+                    <h2 class="${classes.panelTitle} ${classes.commonStyle}"> Panel </h2>
+                    <div class="${classes.buttonContainer} ${classes.commonStyle}">
+                        <button class="${classes.btn} ${classes.commonStyle}" data-btn="add">Add Box</button>
+                        <button class="${classes.btn} ${classes.commonStyle}" data-btn="delete">Delete Box</button>
                     </div>
-                    <div class=${classes.inputContainer}></div>
-                    <button class=${classes.btn} data-btn="save">Save Settings</button>
-                    <button class=${classes.btn} data-btn="addtopage"> Add To Page</button>
-                    <button class=${classes.btn} data-btn="closepopup"> Close </button>
+                    <div class="${classes.inputContainer} ${classes.commonStyle}"></div>
+                    <div class="${classes.buttonContainer} ${classes.commonStyle}">
+                        <button class="${classes.btn} ${classes.commonStyle}" data-btn="save">Save Settings</button>
+                        <button class="${classes.btn} ${classes.commonStyle}" data-btn="addtopage"> Add To Page</button>
+                        <button class="${classes.btn} ${classes.commonStyle}" data-btn="closepopup"> Close </button>
+                    </div>
                 </div>
             </div>
         `
@@ -126,46 +154,50 @@ box = ($) => {
         const customStlye = `
         <style class=${classes.style}>
 
-        ${selectors.body}{
-            
+        ${selectors.commonStyle}}{
+            all: unset;
+        }
+
+        ${selectors.container} * {
+            font-family: arial !important;
+            font-size: 16px !important;
         }
 
         ${selectors.container}{
-            font-family: arial;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 3rem;
-            padding: 3rem;
+            gap: 3em;
+            padding: 3em;
             position: fixed;
             left: 50%;
             top: 50%;
             transform: translate(-50%,-50%);
             z-index: 9999;
             background-color: white;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-            width: 80vw;
-            height: 80vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 90vw;
+            height: 90vh;
         }
 
         ${selectors.boxContainer}{
-            width: 40rem;
-            height: 40rem;
-            padding: 1rem;
+            width: 40em;
+            height: 40em;
+            padding: 1em;
             border: 1px solid ${root["color-4"]};
             border-radius: ${root["rounded-md"]};
             overflow: auto;
             display: flex;
-            gap: 1rem;
+            gap: 1em;
             flex-wrap: wrap;
-            margin: 1rem;
+            margin: 1em;
             position: relative;
         }
 
         ${selectors.box}{
             background-color: white;
-            width: 15rem;
-            height: 15rem;
+            width: 15em;
+            height: 15em;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -189,8 +221,8 @@ box = ($) => {
             border: 1px solid ${root["color-1"]};
             border-radius: ${root["rounded-md"]};
             background-color: ${root["color-1"]};
-            width: 1rem;
-            height: 1rem;
+            width: 1em;
+            height: 1em;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -200,60 +232,68 @@ box = ($) => {
             font-size: 12px;
             background-color: ${root["color-4"]};
             color: white;
-            padding: 1rem;
+            padding: 1em;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1em;
             border-radius: ${root["rounded-md"]};
-            height: 100%;
             overflow: auto;
+            max-height: 100%;
+        }
+
+        ${selectors.panelTitle}{
+            margin: 0;
+            padding: 0;
         }
 
         ${selectors.buttonContainer}{
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1em;
         }
 
         ${selectors.inputContainer}{
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1em;
         }
         
         ${selectors.panelLabel}{
-            font-size: 12px;
+            font-size: 12px !important;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 3rem;
+            gap: 1em;
         }
 
         ${selectors.panelInputContainer}{
             display: flex;
             justify-items: center;
             align-items: center;
-            gap: 1rem;
         }
 
         ${selectors.panelInput}{
-            font-size: 12px;
-            width: 10rem;
-            height: 1.5rem;
-            padding: 0.1rem 0.5rem;
+            font-size: 12px !important;
+            width: 10em;
+            height: 2em;
+            padding: 0.1em 0.5em;
             box-sizing: border-box;
             color: black;
+            flex-shrink: 0;
         }
 
         ${selectors.btn}{
             background-color: ${root["color-2"]};
             color: ${root["color-1"]};
-            height: 3rem;
+            height: 3em;
             border-radius: ${root["rounded-md"]};
             border: none;
             transition: all 0.3s ease;
             cursor: pointer;
-            min-width: 5rem;
+            min-width: 8em;
+            text-align: center;
+            padding: 0 0.5em;
+            font-size: 12px !important;
         }
 
         ${selectors.btn}:hover{
@@ -265,18 +305,18 @@ box = ($) => {
         ${selectors.toastContainer}{
             position: absolute;
             right: 0;
-            bottom: 1rem;
+            bottom: 1em;
             color: ${root["color-1"]};
             background-color: ${root["color-2"]};
             border: 1px solid ${root["color-1"]};
             border-radius: ${root["rounded-md"]};
             box-shadow: 0 0 5px ${root["color-2"]};
-            padding: 1rem 3rem;
+            padding: 1em 3em;
             border-radius: ${root["rounded-md"]};
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1rem;
+            gap: 1em;
         }
 
         ${selectors.iconSuccess}{
@@ -288,8 +328,8 @@ box = ($) => {
         
         ${selectors.mouseCircle}{
             position: fixed;
-            width: 2rem;
-            height: 2rem;
+            width: 2em;
+            height: 2em;
             border-radius: 50%;
             border: 1px solid ${root["color-1"]};
             pointer-events: none;
@@ -298,6 +338,7 @@ box = ($) => {
             transform: translate(-50%, -50%);
             box-shadow: 0 0 10px ${root["color-2"]};
             transition: background-color 0.5s ease;
+            z-index: 10000;
         }
 
         ${selectors.mouseCircleFilled}{
@@ -308,16 +349,16 @@ box = ($) => {
         @media (max-width: 1200px){
             ${selectors.container}{
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.5em;
                 padding: 0;
             }
             ${selectors.boxContainer}{
-                height: 20rem;
+                height: 20em;
             }
             ${selectors.panel}{
-                margin: 0 2rem;
-                gap: 0.5rem;
-                padding: 0.5rem;
+                margin: 0 2em;
+                gap: 0.5em;
+                padding: 0.5em;
             }
             ${selectors.inputContainer}{
                 flex-direction: row;
@@ -325,33 +366,33 @@ box = ($) => {
                 flex-wrap: wrap;
             }
             ${selectors.panelLabel}{
-                width: 15rem;
-                gap: 1rem;
+                width: 15em;
+                gap: 1em;
             }
             ${selectors.panelInput}{
-                width: 5rem;
+                width: 5em;
             }
         }
         @media (max-width: 800px){
             ${selectors.boxContainer}{
-                width: 20rem;
-                height: 15rem;
+                width: 20em;
+                height: 15em;
             }
             ${selectors.panel}{
-                margin: 0 0.5rem;
+                margin: 0 0.5em;
             }
         }
         @media (max-width: 600px){
             ${selectors.boxContainer}{
-                height: 10rem;
+                height: 10em;
             }
         }
         @media (max-width: 400px){
             ${selectors.panelLabel}{
-                width: 10rem;
+                width: 10em;
             }
             ${selectors.panelInput}{
-                width: 3rem;
+                width: 3em;
             }
         }
         
@@ -377,9 +418,9 @@ box = ($) => {
             if (isPartnerSelect) {
                 boxFound.partner = val;
                 $selectedBox.data("partner", val);
-            } else if(isPageSelect){
+            } else if (isPageSelect) {
                 boxFound.page = val;
-                $selectedBox.data("page",val);
+                $selectedBox.data("page", val);
             } else {
                 let boxProps = {};
                 boxProps[dataStyle] = val + dataStyleSuffix;
@@ -415,12 +456,17 @@ box = ($) => {
         });
 
         $(document).on("click.eventListener", selectors.buttonAddtopage, (e) => {
-            const windowSizeWidth = $(document.body).prop("scrollWidth");
-            const windowSizeHeight = $(document.body).prop("scrollHeight");
-            const widthMultiple = windowSizeWidth/self.boxWindowSize.innerWidth;
-            const heightMultiple = windowSizeHeight/self.boxWindowSize.innerHeight;
-            self.renderInitialBoxes(selectors.body,widthMultiple,heightMultiple);
-            self.reset();
+            if (self.checkPartnerForBox()) {
+                const windowSizeWidth = $(document.body).prop("scrollWidth");
+                const windowSizeHeight = $(document.body).prop("scrollHeight");
+                const widthMultiple = windowSizeWidth / self.boxWindowSize.innerWidth;
+                const heightMultiple = windowSizeHeight / self.boxWindowSize.innerHeight;
+                self.showToast("Box added");
+                self.renderInitialBoxes(selectors.body, widthMultiple, heightMultiple);
+                self.reset();
+            } else {
+                self.showToast("Box could not be added", "fail")
+            }
         });
 
         $(document).on("click.eventListener", selectors.buttonClosepopup, (e) => {
@@ -429,15 +475,27 @@ box = ($) => {
 
         $(document).on("click.eventListener", selectors.box, (e) => {
             const $target = $(e.currentTarget);
-            self.toggleBox($target);
+            const id = $target.data("id");
+            const boxFound = self.boxes.find((box) => box.id === id);
+
+            const initialPosition = boxFound.boxPosition;
+            const position = self.getBoxPosition($target);
+            if (position.top === initialPosition.top && position.left === initialPosition.left) {
+                self.toggleBox($target);
+            }
         })
 
         $(document).on("mousemove.eventListener", selectors.body, self.debounce((e) => {
             const { clientX, clientY, pageX, pageY } = e;
 
+            const containerTop = $(selectors.container).position().top;
+            const containerLeft = $(selectors.container).position().left;
+            const mouseLeft = clientX - containerLeft;
+            const mouseTop = clientY - containerTop
+
             $(selectors.mouseCircle).css({
-                left: `${clientX}px`,
-                top: `${clientY}px`
+                left: `${mouseLeft}px`,
+                top: `${mouseTop}px`
             })
 
             if (!self.draggingBox || !self.selectedBoxes.length) return;
@@ -549,27 +607,32 @@ box = ($) => {
         }
     }
 
-    self.renderInitialBoxes = (location = selectors.boxContainer,widthMultiple = 1,heightMultiple = 1) => {
+    self.renderInitialBoxes = (location = selectors.boxContainer, widthMultiple = 1, heightMultiple = 1) => {
         const localBoxes = self.getLocalStorage("boxes");
         if (localBoxes) {
             self.boxes = localBoxes;
             self.boxes.forEach((box) => {
                 const $html = $(box.html);
                 $html.data["id"] = box.id;
+                $html.css(self.defaultBoxProps);
                 if (box.boxProps) {
                     if (box.boxProps["box-shadow-color"] || box.boxProps["box-shadow-size"]) {
                         const size = box.boxProps["box-shadow-size"] || "0";
                         const color = box.boxProps["box-shadow-color"] || "";
                         $html.css({ "box-shadow": `0 0 ${size} ${color}` });
                     }
-                    $html.css(box.boxProps);
+                    Object.keys(box.boxProps).forEach((boxProp) => {
+                        $html[0].style.setProperty(boxProp, box.boxProps[boxProp], "important");
+                    })
+                    $html.css("z-index", 9998);
+                    $html.css("border-style", "solid");
                 }
                 if (box.boxPosition) {
                     const topFloat = parseFloat(box.boxPosition.top);
                     const leftFloat = parseFloat(box.boxPosition.left);
                     $html.css({
-                        top: topFloat*heightMultiple+"px",
-                        left: leftFloat*widthMultiple+"px",
+                        top: topFloat * heightMultiple + "px",
+                        left: leftFloat * widthMultiple + "px",
                         position: "absolute"
                     });
                 } else {
@@ -582,7 +645,7 @@ box = ($) => {
                 if (box.partner) {
                     $html.data("partner", box.partner);
                 }
-                if (box.page){
+                if (box.page) {
                     $html.data("page", box.page);
                 }
                 $(location).append($html);
@@ -676,7 +739,7 @@ box = ($) => {
                 if ($select.data("partner") !== undefined) {
                     const val = selectedBox.partner || "";
                     $select.val(val);
-                } else if($select.data("page") !== undefined){
+                } else if ($select.data("page") !== undefined) {
                     const val = selectedBox.page || "";
                     $select.val(val);
                 } else {
@@ -688,14 +751,23 @@ box = ($) => {
         })
     }
 
-    self.showToast = (msg) => {
-        const $html = $(`
+    self.showToast = (msg, type = "success") => {
+        let $html;
+        if (type === "success") {
+            $html = $(`
             <div class=${classes.toastContainer}>
                 ${icons.success} ${msg}
             </div>    
         `)
+        } else if (type = "fail") {
+            $html = $(`
+            <div class=${classes.toastContainer}>
+                ${icons.fail} ${msg}
+            </div>    
+        `)
+        }
 
-        $(selectors.body).append($html);
+        $(selectors.container).append($html);
         $html.animate({ right: "100px" }, 500)
         setTimeout(() => {
             $html.fadeOut(500);
@@ -711,7 +783,7 @@ box = ($) => {
         });
         let id = maxId + 1;
 
-        const html = `<div class=${classes.box} data-id=${id}> BOX </div>`;
+        const html = `<div class="${classes.box} ${classes.commonStyle}" data-id=${id}> BOX </div>`;
         $(selectors.boxContainer).append(html);
 
         const $box = $(selectors.box).last();
@@ -744,7 +816,7 @@ box = ($) => {
 
     self.renderMouseCircle = () => {
         const $html = $(`<div class=${classes.mouseCircle}></div>`)
-        $(selectors.body).append($html);
+        $(selectors.container).append($html);
     }
 
     self.fillMouseCircle = () => {
@@ -768,11 +840,26 @@ box = ($) => {
             $html.remove();
             self.selectedBoxes = self.selectedBoxes.filter((box) => box.id !== id);
         } else {
-            const $html = $(`<div class=${classes.iconSelecBox}> ${icons.success} </div>`)
+            const $html = $(`<div class="${classes.iconSelecBox} ${classes.commonStyle}"> ${icons.success} </div>`)
             $box.append($html);
             self.selectedBoxes.push(foundBox);
             self.setSelectedInputValues();
         }
+    }
+
+    self.checkPartnerForBox = () => {
+        const box = self.selectedBoxes[0];
+
+        if (!box || globalConfig.partnerName !== box.partner) return false;
+
+        const pageRules = {
+            cartpage: globalConfig.rules.isOnCartPage,
+            mainpage: globalConfig.rules.isOnMainPage,
+            categorypage: globalConfig.rules.isOnCategoryPage,
+            productpage: globalConfig.rules.isOnProductPage,
+        }
+
+        return !!pageRules[box.page];
     }
 
 
