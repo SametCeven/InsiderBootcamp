@@ -647,7 +647,7 @@ box = ($) => {
                 self.renderInitialBoxes(selectors.body, widthMultiple, heightMultiple);
                 self.reset();
             } else {
-                self.showToast("Box could not be added","fail")
+                self.showToast("Box could not be added", "fail")
             }
         });
 
@@ -791,7 +791,7 @@ box = ($) => {
                         $html.css({ "box-shadow": `0 0 ${size} ${color}` });
                     }
                     $html.css(box.boxProps);
-                    $html.css("z-index",9998);
+                    $html.css("z-index", 9998);
                 }
                 if (box.boxPosition) {
                     const topFloat = parseFloat(box.boxPosition.top);
@@ -1017,7 +1017,7 @@ box = ($) => {
         const box = self.selectedBoxes[0];
 
         if (!box || globalConfig.partnerName !== box.partner) return false;
-        
+
         const pageRules = {
             cartpage: globalConfig.rules.isOnCartPage,
             mainpage: globalConfig.rules.isOnMainPage,
