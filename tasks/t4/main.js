@@ -297,6 +297,7 @@ box = ($) => {
 
     const icons = {
         success: `<svg class=${classes.iconSuccess} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#3caa49"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
+        fail: `<svg fill="#c32222" viewBox="0 -8 528 528" xmlns="http://www.w3.org/2000/svg" stroke="#c32222"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><title>fail</title><path d="M264 456Q210 456 164 429 118 402 91 356 64 310 64 256 64 202 91 156 118 110 164 83 210 56 264 56 318 56 364 83 410 110 437 156 464 202 464 256 464 310 437 356 410 402 364 429 318 456 264 456ZM264 288L328 352 360 320 296 256 360 192 328 160 264 224 200 160 168 192 232 256 168 320 200 352 264 288Z"></path></g></svg>`,
     }
 
     self.init = () => {
@@ -313,7 +314,9 @@ box = ($) => {
     self.reset = () => {
         $(selectors.style).remove();
         $(document).off(".eventListener");
-        $(selectors.container).empty();
+        $(selectors.container).remove();
+        $(selectors.toastContainer).remove();
+        $(selectors.mouseCircle).remove();
     }
 
     self.buildHTML = () => {
@@ -644,7 +647,7 @@ box = ($) => {
                 self.renderInitialBoxes(selectors.body, widthMultiple, heightMultiple);
                 self.reset();
             } else {
-                self.showToast("Box could not be added")
+                self.showToast("Box could not be added","fail")
             }
         });
 
@@ -788,6 +791,7 @@ box = ($) => {
                         $html.css({ "box-shadow": `0 0 ${size} ${color}` });
                     }
                     $html.css(box.boxProps);
+                    $html.css("z-index",9998);
                 }
                 if (box.boxPosition) {
                     const topFloat = parseFloat(box.boxPosition.top);
@@ -913,12 +917,21 @@ box = ($) => {
         })
     }
 
-    self.showToast = (msg) => {
-        const $html = $(`
+    self.showToast = (msg, type = "success") => {
+        let $html;
+        if (type === "success") {
+            $html = $(`
             <div class=${classes.toastContainer}>
                 ${icons.success} ${msg}
             </div>    
         `)
+        } else if (type = "fail") {
+            $html = $(`
+            <div class=${classes.toastContainer}>
+                ${icons.fail} ${msg}
+            </div>    
+        `)
+        }
 
         $(selectors.container).append($html);
         $html.animate({ right: "100px" }, 500)
@@ -1002,12 +1015,12 @@ box = ($) => {
 
     self.checkPartnerForBox = () => {
         const box = self.selectedBoxes[0];
-        
-        if(globalConfig.partnerName !== box.partner) return false;
-        if(globalConfig.rules.isOnCartPage && box.page === "cartpage") return true;
-        if(globalConfig.rules.isOnMainPage && box.page === "mainpage") return true;
-        if(globalConfig.rules.isOnProductPage && box.page === "productpage") return true;
-        if(globalConfig.rules.isOnCategoryPage && box.page === "categorypage") return true;
+
+        if (globalConfig.partnerName !== box.partner) return false;
+        if (globalConfig.rules.isOnCartPage && box.page === "cartpage") return true;
+        if (globalConfig.rules.isOnMainPage && box.page === "mainpage") return true;
+        if (globalConfig.rules.isOnProductPage && box.page === "productpage") return true;
+        if (globalConfig.rules.isOnCategoryPage && box.page === "categorypage") return true;
         return false
     }
 
