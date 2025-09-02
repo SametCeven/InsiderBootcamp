@@ -370,7 +370,9 @@ box = ($) => {
             transform: translate(-50%,-50%);
             z-index: 9999;
             background-color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3)
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 80vw;
+            height: 80vh;
         }
 
         ${selectors.boxContainer}{
@@ -430,6 +432,8 @@ box = ($) => {
             flex-direction: column;
             gap: 2rem;
             border-radius: ${root["rounded-md"]};
+            overflow: auto;
+            max-height: 100%;
         }
 
         ${selectors.buttonContainer}{
