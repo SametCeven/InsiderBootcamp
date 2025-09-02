@@ -358,6 +358,7 @@ box = ($) => {
         }
 
         ${selectors.container}{
+            all: unset;
             font-family: arial;
             display: flex;
             justify-content: center;
@@ -390,6 +391,7 @@ box = ($) => {
         }
 
         ${selectors.box}{
+            all: unset;
             background-color: white;
             width: 15rem;
             height: 15rem;
