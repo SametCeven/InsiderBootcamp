@@ -641,7 +641,12 @@ box = ($) => {
             const widthMultiple = windowSizeWidth/self.boxWindowSize.innerWidth;
             const heightMultiple = windowSizeHeight/self.boxWindowSize.innerHeight;
             self.renderInitialBoxes(selectors.body,widthMultiple,heightMultiple);
-            self.reset();
+            if(self.checkPartner){
+                self.showToast("Box added");
+                self.reset();
+            }else{
+                self.showToast("Box could not be added")
+            }
         });
 
         $(document).on("click.eventListener", selectors.buttonClosepopup, (e) => {
@@ -916,7 +921,7 @@ box = ($) => {
             </div>    
         `)
 
-        $(selectors.body).append($html);
+        $(selectors.container).append($html);
         $html.animate({ right: "100px" }, 500)
         setTimeout(() => {
             $html.fadeOut(500);
@@ -999,7 +1004,7 @@ box = ($) => {
     self.checkPartner = () => {
         console.log(globalConfig)
         console.log(self.selectedBoxes[0])
-        return true
+        return false
     }
 
 
