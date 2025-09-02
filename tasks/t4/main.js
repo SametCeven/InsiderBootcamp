@@ -1016,12 +1016,16 @@ box = ($) => {
     self.checkPartnerForBox = () => {
         const box = self.selectedBoxes[0];
 
-        if (globalConfig.partnerName !== box.partner) return false;
-        if (globalConfig.rules.isOnCartPage && box.page === "cartpage") return true;
-        if (globalConfig.rules.isOnMainPage && box.page === "mainpage") return true;
-        if (globalConfig.rules.isOnProductPage && box.page === "productpage") return true;
-        if (globalConfig.rules.isOnCategoryPage && box.page === "categorypage") return true;
-        return false
+        if (!box || globalConfig.partnerName !== box.partner) return false;
+        
+        const pageRules = {
+            cartpage: globalConfig.rules.isOnCartPage,
+            mainpage: globalConfig.rules.isOnMainPage,
+            categorypage: globalConfig.rules.isOnCategoryPage,
+            productpage: globalConfig.rules.isOnProductPage,
+        }
+
+        return !!pageRules[box.page];
     }
 
 
