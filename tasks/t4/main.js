@@ -35,7 +35,7 @@ rules = ($) => {
         testConfig: {
             partnerName: "",
             rules: {
-                isOnCartPage: null, 
+                isOnCartPage: null,
                 isOnCategoryPage: null,
                 isOnMainPage: null,
                 isOnProductPage: null,
@@ -127,7 +127,7 @@ rules = ($) => {
                 mainPage: 5,
                 cartPage: "/pasaj/siparisler",
                 productPage: [/product-detail-page/, /DetailArea/, /campaign-details/, /packages-detail/, /Detail_detail__content/],
-                categoryPage: [/package-selection/, /--filterArea__/, /ListFilter_filterItem/, /campaign-list-filter/,/filter-side-bar/],
+                categoryPage: [/package-selection/, /--filterArea__/, /ListFilter_filterItem/, /campaign-list-filter/, /filter-side-bar/],
             },
             isOnMainPage: () => {
                 if (!self.checkPartner(config.turkcell.partnerName)) return false;
@@ -214,9 +214,9 @@ rules = ($) => {
 
     self.test = () => {
         self.testConfig.partnerName = self.currentPartnerName;
-        
-        Object.values(config).forEach((partner)=>{
-            if(partner.partnerName === self.currentPartnerName){
+
+        Object.values(config).forEach((partner) => {
+            if (partner.partnerName === self.currentPartnerName) {
                 self.testConfig.rules.isOnCartPage = partner.isOnCartPage();
                 self.testConfig.rules.isOnCategoryPage = partner.isOnCategoryPage();
                 self.testConfig.rules.isOnMainPage = partner.isOnMainPage();
@@ -292,7 +292,7 @@ box = ($) => {
         mouseDown: false,
         draggingBox: null,
         dragOffset: { x: 0, y: 0 },
-        boxWindowSize: {innerWidth:null, innerHeight:null},
+        boxWindowSize: { innerWidth: null, innerHeight: null },
     }
 
     const icons = {
@@ -597,9 +597,9 @@ box = ($) => {
             if (isPartnerSelect) {
                 boxFound.partner = val;
                 $selectedBox.data("partner", val);
-            } else if(isPageSelect){
+            } else if (isPageSelect) {
                 boxFound.page = val;
-                $selectedBox.data("page",val);
+                $selectedBox.data("page", val);
             } else {
                 let boxProps = {};
                 boxProps[dataStyle] = val + dataStyleSuffix;
@@ -635,16 +635,15 @@ box = ($) => {
         });
 
         $(document).on("click.eventListener", selectors.buttonAddtopage, (e) => {
-            if(!self.checkPartner()) return;
-            const windowSizeWidth = $(document.body).prop("scrollWidth");
-            const windowSizeHeight = $(document.body).prop("scrollHeight");
-            const widthMultiple = windowSizeWidth/self.boxWindowSize.innerWidth;
-            const heightMultiple = windowSizeHeight/self.boxWindowSize.innerHeight;
-            self.renderInitialBoxes(selectors.body,widthMultiple,heightMultiple);
-            if(self.checkPartner){
+            if (self.checkPartnerForBox()) {
+                const windowSizeWidth = $(document.body).prop("scrollWidth");
+                const windowSizeHeight = $(document.body).prop("scrollHeight");
+                const widthMultiple = windowSizeWidth / self.boxWindowSize.innerWidth;
+                const heightMultiple = windowSizeHeight / self.boxWindowSize.innerHeight;
                 self.showToast("Box added");
+                self.renderInitialBoxes(selectors.body, widthMultiple, heightMultiple);
                 self.reset();
-            }else{
+            } else {
                 self.showToast("Box could not be added")
             }
         });
@@ -775,7 +774,7 @@ box = ($) => {
         }
     }
 
-    self.renderInitialBoxes = (location = selectors.boxContainer,widthMultiple = 1,heightMultiple = 1) => {
+    self.renderInitialBoxes = (location = selectors.boxContainer, widthMultiple = 1, heightMultiple = 1) => {
         const localBoxes = self.getLocalStorage("boxes");
         if (localBoxes) {
             self.boxes = localBoxes;
@@ -794,8 +793,8 @@ box = ($) => {
                     const topFloat = parseFloat(box.boxPosition.top);
                     const leftFloat = parseFloat(box.boxPosition.left);
                     $html.css({
-                        top: topFloat*heightMultiple+"px",
-                        left: leftFloat*widthMultiple+"px",
+                        top: topFloat * heightMultiple + "px",
+                        left: leftFloat * widthMultiple + "px",
                         position: "absolute"
                     });
                 } else {
@@ -808,7 +807,7 @@ box = ($) => {
                 if (box.partner) {
                     $html.data("partner", box.partner);
                 }
-                if (box.page){
+                if (box.page) {
                     $html.data("page", box.page);
                 }
                 $(location).append($html);
@@ -902,7 +901,7 @@ box = ($) => {
                 if ($select.data("partner") !== undefined) {
                     const val = selectedBox.partner || "";
                     $select.val(val);
-                } else if($select.data("page") !== undefined){
+                } else if ($select.data("page") !== undefined) {
                     const val = selectedBox.page || "";
                     $select.val(val);
                 } else {
@@ -1001,9 +1000,14 @@ box = ($) => {
         }
     }
 
-    self.checkPartner = () => {
-        console.log(globalConfig)
-        console.log(self.selectedBoxes[0])
+    self.checkPartnerForBox = () => {
+        const box = self.selectedBoxes[0];
+        
+        if(globalConfig.partnerName !== box.partner) return false;
+        if(globalConfig.rules.isOnCartPage && box.page === "cartpage") return true;
+        if(globalConfig.rules.isOnMainPage && box.page === "mainpage") return true;
+        if(globalConfig.rules.isOnProductPage && box.page === "productpage") return true;
+        if(globalConfig.rules.isOnCategoryPage && box.page === "categorypage") return true;
         return false
     }
 

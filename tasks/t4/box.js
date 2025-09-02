@@ -143,7 +143,7 @@ box = ($) => {
             transform: translate(-50%,-50%);
             z-index: 9999;
             background-color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
             width: 80vw;
             height: 80vh;
         }
